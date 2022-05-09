@@ -16,7 +16,7 @@ SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
 
 SWEP.ViewModelFlip = false
-SWEP.ViewModelFOV = 100
+SWEP.ViewModelFOV = 60
 SWEP.ViewModel = "models/weapons/c_slam.mdl"
 SWEP.WorldModel = "models/niksacokica/datapad/datapad.mdl"
 SWEP.UseHands = true
@@ -35,7 +35,46 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1 
 SWEP.Secondary.Damage = 0 
 SWEP.Secondary.Automatic = false 	 
-SWEP.Secondary.Ammo = "none" 
+SWEP.Secondary.Ammo = "none"
+
+SWEP.ViewModelBoneMods = {
+	["Slam_base"] = { scale = Vector(0.009, 0.009, 0.009), pos = Vector(10, 3, -1), angle = Angle(0, 0, 0) },
+	["Slam_panel"] = { scale = Vector(0.009, 0.009, 0.009), pos = Vector(10, 3, -1), angle = Angle(0, 0, 0) },
+	["Detonator"] = { scale = Vector(0.009, 0.009, 0.009), pos = Vector(10, 3, -1), angle = Angle(0, 0, 0) },
+	
+	["ValveBiped.Bip01_L_UpperArm"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -10, -10) },
+	["ValveBiped.Bip01_L_Forearm"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(6, -20, 0) },
+	["ValveBiped.Bip01_L_Hand"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(40, -10, -40) },
+	
+	["ValveBiped.Bip01_L_Finger0"] = { scale = Vector(1, 1, 1), pos = Vector(0, -0.5, -0.5), angle = Angle(0, 10, 30) },
+	["ValveBiped.Bip01_L_Finger01"] = { scale = Vector(1, 1, 1), pos = Vector(-0.1, 0, 0), angle = Angle(-5, -30, 0) },
+	["ValveBiped.Bip01_L_Finger02"] = { scale = Vector(1, 1, 1), pos = Vector(-0.1, 0, 0), angle = Angle(-5, -40, 10) },
+	
+	["ValveBiped.Bip01_L_Finger1"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -44, 0) },
+	["ValveBiped.Bip01_L_Finger11"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 20, 0) },
+	["ValveBiped.Bip01_L_Finger12"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 30, 0) },
+	
+	["ValveBiped.Bip01_L_Finger2"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -27, 0) },
+	["ValveBiped.Bip01_L_Finger21"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 50, 0) },
+	["ValveBiped.Bip01_L_Finger22"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 50, 0) },
+	
+	["ValveBiped.Bip01_L_Finger3"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -10, 0) },
+	["ValveBiped.Bip01_L_Finger31"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 40, 0) },
+	["ValveBiped.Bip01_L_Finger32"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 80, 0) },
+	
+	["ValveBiped.Bip01_L_Finger4"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0) },
+	["ValveBiped.Bip01_L_Finger41"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 50, 0) },
+	["ValveBiped.Bip01_L_Finger42"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 80, 0) },
+	
+	
+	["ValveBiped.Bip01_R_UpperArm"] = { scale = Vector(1, 1, 1), pos = Vector(-2, 0, 0), angle = Angle(5, 0, 0) },
+	["ValveBiped.Bip01_R_Forearm"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(-10, -15, 10) },
+	["ValveBiped.Bip01_R_Hand"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(30, -10, 0) }
+}
+	
+SWEP.VElements = {
+	["datapad"] = { model = "models/niksacokica/datapad/datapad.mdl", bone = "Slam_base", pos = Vector(2, -75, 14), angle = Angle(39, 13, 210), size = Vector(1.1, 1.1, 1.1) }
+}
 
 function SWEP:Initialize()
 	self:SetWeaponHoldType( self.HoldType )
@@ -50,185 +89,125 @@ end
 function SWEP:Reload()
 end
 
-function SWEP:ViewModelDrawn( vm )
-	self.VElements = {
-		["element_name"] = { type = "Model", model = "models/niksacokica/datapad/datapad.mdl", bone = "v_weapon.famas", rel = "", pos = Vector(2, 1, 3), angle = Angle(90, 180, 90), size = Vector(0.1, 0.1, 0.1), color = Color(255, 255, 255, 255), surpresslightning = false, material = "", skin = 0, bodygroup = {} }
-	}
+function SWEP:Holster(target)
+	self:ResetBonePositions()
 	
-	if self.VElements then
-		self:CreateModels(self.VElements, true)
-
-		self.SCKMaterialCached_V = self.SCKMaterialCached_V or {}
-
-		if (not self.vRenderOrder) then
-			-- // we build a render order because sprites need to be drawn after models
-			self.vRenderOrder = {}
-
-			for k, v in pairs(self.VElements) do
-				if (v.type == "Model") then
-					table.insert(self.vRenderOrder, 1, k)
-				end
-			end
-		end
-
-		for _, name in ipairs(self.vRenderOrder) do
-			local v = self.VElements[name]
-
-			if (not v) then
-				self.vRenderOrder = nil
-				break
-			end
-
-			if (v.hide) then continue end
-			local model = v.curmodel
-			local sprite = v.spritemat
-			if (not v.bone) then continue end
-			local pos, ang = self:GetBoneOrientation(self.VElements, v, vm)
-			if not pos and not v.bonemerge then continue end
-
-			if (v.type == "Model" and IsValid(model)) then
-				if not v.bonemerge then
-					model:SetPos(pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z)
-					ang:RotateAroundAxis(ang:Up(), v.angle.y)
-					ang:RotateAroundAxis(ang:Right(), v.angle.p)
-					ang:RotateAroundAxis(ang:Forward(), v.angle.r)
-					model:SetAngles(ang)
-				end
-
-				if (v.surpresslightning) then
-					render.SuppressEngineLighting(true)
-				end
-
-				if v.bonemerge then
-					if v.rel and self.VElements[v.rel] and IsValid(self.VElements[v.rel].curmodel) then
-						v.parModel = self.VElements[v.rel].curmodel
-					else
-						v.parModel = self.OwnerViewModel or self
-					end
-					if model:GetParent() ~= v.parModel then
-						model:SetParent(v.parModel)
-					end
-
-					if not model:IsEffectActive(EF_BONEMERGE) then
-						model:AddEffects(EF_BONEMERGE)
-						model:AddEffects(EF_BONEMERGE_FASTCULL)
-						model:SetMoveType(MOVETYPE_NONE)
-						model:SetLocalPos(vector_origin)
-						model:SetLocalAngles(angle_zero)
-					end
-				elseif model:IsEffectActive(EF_BONEMERGE) then
-					model:RemoveEffects(EF_BONEMERGE)
-					model:SetParent(nil)
-				end
-
-				render.SetColorModulation(v.color.r / 255, v.color.g / 255, v.color.b / 255)
-				render.SetBlend(v.color.a / 255)
-				model:DrawModel()
-				render.SetBlend(1)
-				render.SetColorModulation(1, 1, 1)
-
-				if (v.surpresslightning) then
-					render.SuppressEngineLighting(false)
-				end
-			end
-		end
-	end
-	
-	--vm:SetModel("models/niksacokica/datapad/datapad.mdl")
-	--local scale = Vector(0.44, 0.44, 0.44)
-
-	--local mat = Matrix()
-	--mat:Scale(scale)
-	--vm:EnableMatrix("RenderMultiply", mat)
+	return true
 end
 
-function SWEP:GetBoneOrientation(basetabl, tabl, ent, bone_override)
-	local bone, pos, ang
-	if not IsValid(ent) then return Vector(0, 0, 0), Angle(0, 0, 0) end
+function SWEP:OnDrop()
+	self:ResetBonePositions()
+end
 
-	if tabl.rel and tabl.rel ~= "" and not tabl.bonemerge then
-		local v = basetabl[tabl.rel]
-		if (not v) then return end
-		local boneName = bone_override or tabl.bone
+function SWEP:OwnerChanged()
+	self:ResetBonePositions()
+end
 
-		if v.curmodel and ent ~= v.curmodel and (v.bonemerge or (boneName and boneName ~= "" and v.curmodel:LookupBone(boneName))) then
-			v.curmodel:SetupBones()
-			pos, ang = self:GetBoneOrientation(basetabl, v, v.curmodel, boneName)
-			if pos and ang then return pos, ang end
-		else
-			--As clavus states in his original code, don't make your elements named the same as a bone, because recursion.
-			pos, ang = self:GetBoneOrientation(basetabl, v, ent)
+function SWEP:OnRemove()
+	self:ResetBonePositions()
+end
 
-			if pos and ang then
-				pos = pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z
-				ang:RotateAroundAxis(ang:Up(), v.angle.y)
-				ang:RotateAroundAxis(ang:Right(), v.angle.p)
-				ang:RotateAroundAxis(ang:Forward(), v.angle.r)
-				-- For mirrored viewmodels.  You might think to scale negatively on X, but this isn't the case.
+function SWEP:ViewModelDrawn( vm )
+	self:UpdateBonePositions( vm )
+	
+	if self.VElements then
+		self:CreateModels( self.VElements )
 
-				return pos, ang
+		for k, v in pairs( self.VElements ) do
+			local model = v.curmodel
+			if not v.bone then continue end
+			
+			local pos, ang = self:GetBoneOrientation( self.VElements, v, vm )
+			if not pos and not ang then continue end
+
+			if IsValid( model ) then
+				model:SetPos( pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z )
+				ang:RotateAroundAxis( ang:Up(), v.angle.y )
+				ang:RotateAroundAxis( ang:Right(), v.angle.p )
+				ang:RotateAroundAxis( ang:Forward(), v.angle.r )
+				model:SetAngles( ang )
+
+				if model:IsEffectActive( EF_BONEMERGE ) then
+					model:RemoveEffects( EF_BONEMERGE )
+					model:SetParent( nil )
+				end
+
+				model:DrawModel()
 			end
 		end
 	end
+end
 
-	if isnumber(bone_override) then
-		bone = bone_override
-	else
-		bone = ent:LookupBone(bone_override or tabl.bone) or 0
+function SWEP:UpdateBonePositions( vm )	
+	if self.ViewModelBoneMods then
+		for k, v in pairs( self.ViewModelBoneMods ) do
+			local v = self.ViewModelBoneMods[k] or self:GetStat("ViewModelBoneMods." .. k)
+			if not v then continue end
+
+			local bone = vm:LookupBone(k)
+			if not bone then continue end
+
+			if vm:GetManipulateBoneScale(bone) ~= v.scale then
+				vm:ManipulateBoneScale(bone, v.scale)
+			end
+			if vm:GetManipulateBoneAngles(bone) ~= v.angle then
+				vm:ManipulateBoneAngles(bone, v.angle)
+			end
+			if vm:GetManipulateBonePosition(bone) ~= v.pos then
+				vm:ManipulateBonePosition(bone, v.pos)
+			end
+		end
 	end
+end
 
-	if (not bone) or (bone == -1) then return end
-	pos, ang = Vector(0, 0, 0), Angle(0, 0, 0)
-	local m = ent:GetBoneMatrix(bone)
+function SWEP:ResetBonePositions()
+	if not IsValid(self:GetOwner()) then return end
+	
+	local vm = self:GetOwner():GetViewModel()
+	if not IsValid( vm ) then return end
 
-	if (m) then
-		pos, ang = m:GetTranslation(), m:GetAngles()
+	for i = 0, vm:GetBoneCount() do
+		vm:ManipulateBoneScale(i, Vector(1, 1, 1))
+		vm:ManipulateBoneAngles(i, Angle(0, 0, 0))
+		vm:ManipulateBonePosition(i, vector_origin)
 	end
+end
 
-	if (IsValid(self:GetOwner()) and self:GetOwner():IsPlayer() and ent == self:GetOwner():GetViewModel() and self.ViewModelFlip) then
-		ang.r = -ang.r
+function SWEP:GetBoneOrientation( basetabl, tabl, ent )	
+	local pos, ang = Vector(0, 0, 0), Angle(0, 0, 0)
+	
+	if IsValid( ent ) then
+		local bone = ent:LookupBone( tabl.bone ) or 0
+		if not bone or bone == -1 then return end
+		
+		local m = ent:GetBoneMatrix(bone)
+		if m then
+			pos, ang = m:GetTranslation(), m:GetAngles()
+		end
 	end
 
 	return pos, ang
 end
 
-function SWEP:CreateModels(tabl, is_vm)
-	if (not tabl) then return end
-
+function SWEP:CreateModels( tabl )
 	for _, v in pairs(tabl) do
-		if (v.type == "Model" and v.model and (not IsValid(v.curmodel) or v.curmodelname ~= v.model) and v.model ~= "") then
-			v.curmodel = ClientsideModel(v.model, RENDERGROUP_VIEWMODEL)
-			TFA.RegisterClientsideModel(v.curmodel, self)
+		if v.model and ( not IsValid( v.curmodel ) or v.curmodelname ~= v.model ) and v.model ~= "" then
+			v.curmodel = ClientsideModel( v.model, RENDERGROUP_VIEWMODEL )
 
-			if (IsValid(v.curmodel)) then
+			if IsValid( v.curmodel ) then
 				v.curmodel:SetPos(self:GetPos())
 				v.curmodel:SetAngles(self:GetAngles())
 				v.curmodel:SetParent(self)
 				v.curmodel:SetOwner(self)
 				v.curmodel:SetNoDraw(true)
 
-				if v.material then
-					v.curmodel:SetMaterial(v.material or "")
-				end
-
-				if v.skin then
-					v.curmodel:SetSkin(v.skin)
-				end
-
 				local matrix = Matrix()
 				matrix:Scale(v.size)
 				v.curmodel:EnableMatrix("RenderMultiply", matrix)
 				v.curmodelname = v.model
-
-				if is_vm then
-					v.view = true
-				else
-					v.view = false
-				end
 			else
 				v.curmodel = nil
 			end
-			-- // make sure we create a unique name based on the selected options
 		end
 	end
 end
