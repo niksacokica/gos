@@ -81,8 +81,11 @@ function SWEP:Initialize()
 end 
 
 function SWEP:PrimaryAttack()
+	if CLIENT then
+		hook.Run( "DatapadTrigger" )
+	end
 end
-	
+
 function SWEP:SecondaryAttack()
 end
 
