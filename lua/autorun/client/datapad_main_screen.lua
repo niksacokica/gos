@@ -24,12 +24,18 @@ datapad.addCommand = function( cmd )
 	--end
 end
 
-datapad.executeCommand = function( cmd )
+datapad.executeCommand = function( cmd, window )
 	local cAf = string.Explode( " ", cmd )
+	for i=#cAf, 1, -1 do
+		if #cAf[i] == 0 then
+			table.remove( cAf, i )
+		end
+	end
 	cAf[1] = string.lower( cAf[1] )
 	
-	return istable( datapad.cmds[cAf[1]] ) and tostring( datapad.cmds[cAf[1]]["function"]( cAf ) or "" )
-		or "'" .. cAf[1] .. "' is not recognized as a command!\n"
+	if istable( datapad.cmds[cAf[1]] ) then return datapad.cmds[cAf[1]]["function"]( cAf, window ) end
+	
+	return "'" .. cAf[1] .. "' is not recognized as a command!\n"
 end
 
 local files, directories = file.Find( "datapad/*", "LUA" )
@@ -43,49 +49,47 @@ for _, d in ipairs( directories ) do
 	end
 end
 
-local background_clr = Color(126, 185, 181)
-local function createScreen()
-	local background = vgui.Create( "DFrame" )
-	background:SetPos( 0, 0 )
-	background:SetSize( ScrW(), ScrH() )
-	background:SetTitle( "" )
-	background:SetDraggable( false )
-	background:SetKeyboardInputEnabled( true )
-	background:SetMouseInputEnabled( true )
-	background:MakePopup()
-	background:SetPopupStayAtBack( true )
+datapad.startApp = function( v )
+	local window = vgui.Create( "DFrame" )
+	window:Center()
+	window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
+	window:SetParent( datapad.screen )
+	window:MakePopup()
 	
-	background.Paint = function( self, w, h )
-		surface.SetDrawColor( background_clr )
-		surface.DrawRect( 0, 0, w, h )
+	function handleWindowClose()
+		for key, val in ipairs( datapad.screen.OpenApps ) do
+			if val[2] == v["name"] and val[1] == window then
+				table.remove( datapad.screen.OpenApps, key )
+				
+				return
+			end
+		end
 	end
 	
-	background.OnClose = function()
-		background:Remove()
+	function window:OnClose()
+		handleWindowClose()
+	end
+	function window:OnRemove()
+		handleWindowClose()
 	end
 	
-	populateApps( background )
+	table.insert( datapad.screen.OpenApps, { window, v["name"] } )
+	v["window"]( window )
+	
+	return window
 end
 
-function populateApps( background )
+local function populateApps()
 	local w = 0.03
 	local h = 0.05
 	
 	for k, v in pairs( datapad.apps ) do
-		local app = vgui.Create( "DButton", background )
+		local app = vgui.Create( "DButton", datapad.screen )
 		app:SetText( "" )
 		app:SetPos( ScrW() * w, ScrH() * h )
 		app:SetSize( ScrW() * 0.1, ScrH() * 0.1778 )
 		app.DoDoubleClick = function()
-			local pnl = v["window"]( background )
-			if not IsValid( pnl ) then
-				ErrorNoHalt( v["name"] .. " did not return the panel! Please contact the creator " .. v["creator"] .. "!" )
-				background:Remove()
-				
-				return
-			end
-			
-			pnl:SetParent( background )
+			datapad.startApp( v )
 		end
 		
 		app.Paint = function( self, w, h )
@@ -100,6 +104,32 @@ function populateApps( background )
 			h = h + 0.05
 		end
 	end
+end
+
+local background_clr = Color(126, 185, 181)
+local function createScreen()
+	if not isstring( datapad.shutdownTimer ) then datapad.shutdownTimer = "DatapadShutdown" .. LocalPlayer():EntIndex() end
+	
+	local background = vgui.Create( "DFrame" )
+	background:SetPos( 0, 0 )
+	background:SetSize( ScrW(), ScrH() )
+	background:SetTitle( "" )
+	background:SetDraggable( false )
+	background:MakePopup()
+	background:SetPopupStayAtBack( true )
+	
+	background.Paint = function( self, w, h )
+		surface.SetDrawColor( background_clr )
+		surface.DrawRect( 0, 0, w, h )
+	end
+	
+	background.OnClose = function()
+		background:Remove()
+	end
+	
+	datapad.screen = background
+	background.OpenApps = {}
+	populateApps()
 end
 
 hook.Add( "DatapadTrigger", "DatapadTriggerMain", createScreen )

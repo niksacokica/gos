@@ -2,19 +2,22 @@ datapad.addApp({
 	["name"] = "Command Prompt",
 	["icon"] = "datapad/command_prompt.png",
 	["creator"] = "niksacokica",
-	["window"] = function( background )
-		local cmd = vgui.Create( "DFrame" )
-		cmd:SetPos( ScrW() * 0.3, ScrH() * 0.3 )
-		cmd:SetSize( ScrW() * 0.4, ScrH() * 0.4 )
-		cmd:SetTitle( "" )
-		cmd:ShowCloseButton( false )
-		cmd:MakePopup()
+	["window"] = function( window )		
+		window:SetPos( ScrW() * 0.3, ScrH() * 0.3 )
+		window:SetSize( ScrW() * 0.4, ScrH() * 0.4 )
+		window:SetTitle( "" )
+		window:ShowCloseButton( false )
+		window.title = "Command Prompt"
+		window.noDel = 12
+		window.echo = true
+		window.echoString = LocalPlayer():GetName() .. ">"
 		
-		cmd.Paint = function( self, w, h )
+		local background_color = color_black
+		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
-			surface.SetDrawColor( color_black )
+			surface.SetDrawColor( background_color )
 			surface.DrawRect( w * 0.002, h * 0.074, w * 0.998, h * 0.926 )
 			
 			surface.SetDrawColor( color_white )
@@ -23,19 +26,19 @@ datapad.addApp({
 			surface.SetFont( "DermaDefaultBold" )
 			surface.SetTextColor( color_black )
 			surface.SetTextPos( w * 0.05, h * 0.022 ) 
-			surface.DrawText( "Command Prompt" )
+			surface.DrawText( window.title )
 			
 			surface.SetDrawColor( color_white )
 			surface.SetMaterial( Material( "datapad/command_prompt.png" ) )
 			surface.DrawTexturedRect( w * 0.01, h * 0.015, w * 0.03, h * 0.05 )
 		end
 		
-		local cls = vgui.Create( "DButton", cmd )
+		local cls = vgui.Create( "DButton", window )
 		cls:SetText( "" )
 		cls:SetPos( ScrW() * 0.3777, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
-			cmd:Close()
+			window:Close()
 		end
 		
 		cls.Paint = function( self, w, h )
@@ -47,9 +50,9 @@ datapad.addApp({
 			surface.DrawLine( w * 0.4, h * 0.65, w * 0.6, h * 0.35 )
 			surface.DrawLine( w * 0.41, h * 0.351, w * 0.61, h * 0.651 )
 			surface.DrawLine( w * 0.41, h * 0.651, w * 0.61, h * 0.351 )
-		end
+		end		
 		
-		local txt = vgui.Create( "DTextEntry", cmd )
+		local txt = vgui.Create( "DTextEntry", window )
 		txt:SetPos( 0, ScrH() * 0.029 )
 		txt:SetSize( ScrW() * 0.4, ScrH() * 0.37 )
 		txt:SetVerticalScrollbarEnabled( true )
@@ -62,48 +65,74 @@ datapad.addApp({
 		txt:SetCursorColor( color_gray )
 		txt:SetTextColor( color_gray )
 		txt:SetFont( "BudgetLabel" )
-		txt:SetText( LocalPlayer():GetName() .. ">" )
+		txt:SetText( window.echoString )
 		
 		txt.OnMousePressed = function( self, kc )
 			if kc == MOUSE_RIGHT then return true end
 		end
 		
-		local noDel = 13
 		local history = {}
 		local hPos = 0
-		local curTxt = ""
-		txt.OnKeyCodeTyped = function( self, kc )
+		local curTxt = window.echoString
+		local pressToContinue = false
+		local pressToContinueChar = false
+		local ignore = false
+		txt.AllowInput = function( self, stringValue )		
+			if pressToContinueChar then
+				if ignore then return true end
+			
+				pressToContinueChar = false
+				return true
+			end
+			
+			local s, e = txt:GetSelectedTextRange()
+			s = ( s == 0 || s == e ) and txt:GetCaretPos() or s
+			if s < window.noDel then
+				txt:SetText( curTxt )
+				txt:SetCaretPos( window.noDel )
+			end
+		end
+		txt.OnKeyCodeTyped = function( self, kc )			
+			if pressToContinue then
+				if ignore and not ( kc == 67 ) then return true end
+				
+				if timer.Exists( "DatapadTimeout" .. LocalPlayer():EntIndex() ) then
+					timer.Remove( "DatapadTimeout" .. LocalPlayer():EntIndex() )
+				end
+				
+				txt:SetText( txt:GetText() .. "\n\n" .. ( window.echo and window.echoString or "" ) )
+				window.noDel = #txt:GetText()
+				txt:SetCaretPos( window.noDel )
+				curTxt = txt:GetText()
+				
+				pressToContinue = false
+				ignore = false
+				return true
+			end
+		
 			local s, e = txt:GetSelectedTextRange()
 			s = ( s == 0 || s == e ) and txt:GetCaretPos() or s
 			
-			if ( kc == 66 and s < noDel + ( ( s == e || e == 0 ) and 1 or 0 ) ) || ( kc == 73 and s < noDel ) then
+			if ( kc == 66 and s < window.noDel + ( ( s == e || e == 0 ) and 1 or 0 ) ) || ( kc == 73 and s < window.noDel ) then
 				if not ( s == e ) and not ( e == 0 ) then
-					txt:SetText( ( #curTxt and curTxt .. "\n" ) .. LocalPlayer():GetName() .. ">" )
-					txt:SetCaretPos( noDel )
+					txt:SetText( curTxt )
+					txt:SetCaretPos( window.noDel )
 				end
 				
 				return true
 			elseif kc == 64 then
 				local text = txt:GetText()
-				local strLen = #text
-				local command = string.sub( text, ( noDel == 13 and noDel or noDel + 1 ) )
-				noDel = strLen + 13
+				local command = string.sub( text, window.noDel + 1)
 				
+				hPos = #history
 				if not ( history[#history] == command ) then
 					table.insert( history, command )
 					hPos = #history + 1
 				end
 				
-				local ret = ""
 				if #command > 0 then
-					local ec = datapad.executeCommand( command )
-					ret = ( #ec > 0 ) and ec .. "\n" or ec
+					window:executeCommand( command )
 				end
-				
-				txt:SetText( text .. "\n" .. ret .. LocalPlayer():GetName() .. ">" )
-				noDel = #txt:GetText()
-				txt:SetCaretPos( noDel )
-				curTxt = txt:GetText()
 				
 				return true
 			elseif kc == 88 then
@@ -111,8 +140,10 @@ datapad.addApp({
 					hPos = hPos - 1
 				end
 				
-				txt:SetText( curTxt .. history[hPos] )
-				txt:SetCaretPos( string.len( txt:GetText() ) )
+				if history then
+					txt:SetText( curTxt .. history[hPos] )
+					txt:SetCaretPos( string.len( txt:GetText() ) )
+				end
 				
 				return true
 			elseif kc == 90 then
@@ -125,13 +156,64 @@ datapad.addApp({
 					hPos = hPos + 1
 					
 					txt:SetText( curTxt )
-					txt:SetCaretPos( noDel )
+					txt:SetCaretPos( window.noDel )
 				end
 				
 				return true
 			end
 		end
 		
-		return cmd
+		function window:GetText()
+			return txt:GetText()
+		end
+		function window:SetText( str )
+			txt:SetText( str )
+		end
+		function window:SetCaretPos( pos )
+			txt:SetCaretPos( pos )
+		end
+		function window:ResetColors()
+			background_color = color_black
+			txt:SetCursorColor( color_gray )
+			txt:SetTextColor( color_gray )
+		end
+		function window:SetForegroundColor( clr )
+			txt:SetCursorColor( clr )
+			txt:SetTextColor( clr )
+		end
+		function window:SetBackgroundColor( clr )
+			background_color = clr
+		end
+		function window:SetWindowTitle( str )
+			window.title = str
+		end
+		function window:ShouldPrint( bool )
+			pressToContinue = not bool
+			pressToContinueChar = not bool
+		end
+		function window:Ignore( bool )
+			ignore = bool
+		end
+		function window:SetEcho( bool )
+			window.echo = bool
+		end
+		function window:executeCommand( cmd )
+			local ex = datapad.executeCommand( cmd, window )
+			if ex == nil then return end
+			ex = tostring( ex )
+				
+			if not pressToContinue then
+				txt:SetText( txt:GetText() .. "\n" .. ( #ex > 0 and ex .. "\n" or ex ) .. ( window.echo and window.echoString or "" ) )
+				window.noDel = #txt:GetText()
+				txt:SetCaretPos( window.noDel )
+				curTxt = txt:GetText()
+			end
+		end
+		function window:appendText( text )
+			txt:SetText( txt:GetText() .. text )
+			window.noDel = #txt:GetText()
+			txt:SetCaretPos( window.noDel )
+			curTxt = txt:GetText()
+		end
 	end
 })
