@@ -8,9 +8,9 @@ datapad.addApp({
 		window:SetTitle( "" )
 		window:ShowCloseButton( false )
 		window.title = "Command Prompt"
-		window.noDel = 12
 		window.echo = true
 		window.echoString = LocalPlayer():GetName() .. ">"
+		window.noDel = #window.echoString
 		
 		local background_color = color_black
 		window.Paint = function( self, w, h )
