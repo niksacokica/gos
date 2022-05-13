@@ -55,7 +55,9 @@ datapad.addCommand({
 		end
 		if cIsSet || kIsSet then
 			local str = table.concat( args, " ", ckKey )
-			print(str)
+			for k, v in ipairs( string.Split( str, "&&" ) ) do
+				newApp:executeCommand( v )
+			end
 			
 			if cIsSet then
 				newApp:executeCommand( "exit" )
