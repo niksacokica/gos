@@ -4,7 +4,7 @@ datapad.addCommand({
 	["description"] = "Clears the screen.",
 	["help"] = "CLS",
 	["function"] = function( args, window )
-		window:SetText( "" )
+		window:ResetText()
 		
 		return ""
 	end

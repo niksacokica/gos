@@ -83,7 +83,7 @@ local function populateApps()
 	local w = 0.03
 	local h = 0.05
 	
-	for k, v in pairs( datapad.apps ) do
+	for k, v in SortedPairs( datapad.apps ) do
 		local app = vgui.Create( "DButton", datapad.screen )
 		app:SetText( "" )
 		app:SetPos( ScrW() * w, ScrH() * h )
@@ -92,13 +92,14 @@ local function populateApps()
 			datapad.startApp( v )
 		end
 		
+		local app_icon = Material( v["icon"] )
 		app.Paint = function( self, w, h )
 			surface.SetDrawColor( color_white )
-			surface.SetMaterial( Material( v["icon"] ) )
+			surface.SetMaterial( app_icon )
 			surface.DrawTexturedRect( 0, 0, w, h )
 		end
 		
-		w = w + 0.03
+		w = w + 0.13
 		if w >= ScrW() then
 			w = 0.03
 			h = h + 0.05
@@ -118,9 +119,14 @@ local function createScreen()
 	background:MakePopup()
 	background:SetPopupStayAtBack( true )
 	
+	local datapad_screen_effect = Material( "niksacokica/datapad/datapad_screen_effect" )
 	background.Paint = function( self, w, h )
 		surface.SetDrawColor( background_clr )
 		surface.DrawRect( 0, 0, w, h )
+		
+		--surface.SetDrawColor( color_white )
+		--surface.SetMaterial( datapad_screen_effect )
+		--surface.DrawTexturedRect( 0, 0, w, h )
 	end
 	
 	background.OnClose = function()
@@ -133,3 +139,20 @@ local function createScreen()
 end
 
 hook.Add( "DatapadTrigger", "DatapadTriggerMain", createScreen )
+
+local tmr = CurTime()
+matproxy.Add({
+    name = "DatapadScreen", 
+    init = function( self, mat, values )
+    end,
+    bind = function( self, mat, ent )
+		if mat:GetName() == "niksacokica/datapad/datapad_screen_effect" and tmr < CurTime() then
+			tmr = CurTime() + 0.3
+			
+			local matrix = mat:GetMatrix( "$basetexturetransform" )
+			matrix:Translate( Vector( 0, math.random( -1000, 1000 ), 0 ) )
+			
+			mat:SetMatrix( "$basetexturetransform", matrix )
+		end
+	end 
+})

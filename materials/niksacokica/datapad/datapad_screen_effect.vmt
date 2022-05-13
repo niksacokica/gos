@@ -1,0 +1,12 @@
+"UnlitGeneric"
+{
+	"$basetexture" "niksacokica/datapad/noise_effect"
+	"$blendTintByBaseAlpha"    "1"
+	"$additive" "1"
+	"Proxies"
+	{
+		"DatapadScreen"
+		{
+		}
+	}
+}

@@ -166,8 +166,11 @@ datapad.addApp({
 		function window:GetText()
 			return txt:GetText()
 		end
-		function window:SetText( str )
-			txt:SetText( str )
+		function window:ResetText()
+			txt:SetText( "" )
+		end
+		function window:GetCaretPos()
+			return txt:GetCaretPos()
 		end
 		function window:SetCaretPos( pos )
 			txt:SetCaretPos( pos )
@@ -187,6 +190,9 @@ datapad.addApp({
 		function window:SetWindowTitle( str )
 			window.title = str
 		end
+		function window:GetWindowTitle()
+			return window.title
+		end
 		function window:ShouldPrint( bool )
 			pressToContinue = not bool
 			pressToContinueChar = not bool
@@ -196,6 +202,18 @@ datapad.addApp({
 		end
 		function window:SetEcho( bool )
 			window.echo = bool
+		end
+		function window:GetEcho()
+			return window.echo
+		end
+		function window:SetEchoString( str )
+			window.echoString = str
+		end
+		function window:ResetEchoString()
+			window.echoString = LocalPlayer():GetName() .. ">" 
+		end
+		function window:GetEchoString()
+			return window.echoString
 		end
 		function window:executeCommand( cmd )
 			local ex = datapad.executeCommand( cmd, window )

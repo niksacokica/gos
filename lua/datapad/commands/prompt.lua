@@ -5,9 +5,9 @@ datapad.addCommand({
 	["help"] = "PROMPT [text]\n\n  text    Specifies a new command prompt.",
 	["function"] = function( args, window )
 		if #args == 1 then
-			window.echoString = LocalPlayer():GetName() .. ">"
+			window:ResetEchoString()
 		else
-			window.echoString = table.concat( args, " ", 2 )
+			window:SetEchoString( table.concat( args, " ", 2 ) )
 		end
 		
 		return ""
