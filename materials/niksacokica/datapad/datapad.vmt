@@ -8,4 +8,9 @@
     	"$envmapfresnel" "1"
 
     	"$envmaptint" "[.5 .5 .5]"
+
+	"$detail" "niksacokica\datapad\datapad_e"
+    	"$detailblendmode" "6"
+    	"$detailblendfactor" "1"
+    	"$detailscale" "1"
 }

@@ -79,15 +79,11 @@ datapad.startApp = function( v )
 	return window
 end
 
-local function populateApps()
-	local w = 0.03
-	local h = 0.05
-	
+local function populateApps( grid )	
 	for k, v in SortedPairs( datapad.apps ) do
-		local app = vgui.Create( "DButton", datapad.screen )
+		local app = vgui.Create( "DButton" )
 		app:SetText( "" )
-		app:SetPos( ScrW() * w, ScrH() * h )
-		app:SetSize( ScrW() * 0.1, ScrH() * 0.1778 )
+		app:SetSize( grid:GetColWide() - 50, grid:GetRowHeight() - 50 )
 		app.DoDoubleClick = function()
 			datapad.startApp( v )
 		end
@@ -99,10 +95,8 @@ local function populateApps()
 			surface.DrawTexturedRect( 0, 0, w, h )
 		end
 		
-		w = w + 0.13
-		if w >= ScrW() then
-			w = 0.03
-			h = h + 0.05
+		if #grid:GetItems() < 50 then
+			grid:AddItem( app )
 		end
 	end
 end
@@ -119,7 +113,10 @@ local function createScreen()
 	background:MakePopup()
 	background:SetPopupStayAtBack( true )
 	
-	local datapad_screen_effect = Material( "niksacokica/datapad/datapad_screen_effect" )
+	background.OpenApps = {}
+	datapad.screen = background
+	
+	--local datapad_screen_effect = Material( "niksacokica/datapad/datapad_screen_effect" )
 	background.Paint = function( self, w, h )
 		surface.SetDrawColor( background_clr )
 		surface.DrawRect( 0, 0, w, h )
@@ -133,9 +130,13 @@ local function createScreen()
 		background:Remove()
 	end
 	
-	datapad.screen = background
-	background.OpenApps = {}
-	populateApps()
+	local grid = vgui.Create( "DGrid", background )
+	grid:SetPos( 50, 50 )
+	grid:SetCols( 10 )
+	grid:SetColWide( ( ScrW() / 10 ) - 5 )
+	grid:SetRowHeight( ScrW() / 9.1 - 5 )	
+	
+	populateApps( grid )
 end
 
 hook.Add( "DatapadTrigger", "DatapadTriggerMain", createScreen )
