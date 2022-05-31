@@ -143,7 +143,7 @@ datapad.addApp({
 		
 		local w = 0.002
 		local h = 0.122
-		for k, v in ipairs( buttons ) do			
+		--[[for k, v in ipairs( buttons ) do			
 			local but = vgui.Create( "DButton", window )
 			but:SetText( v["name"] )
 			but:SetPos( ScrW() * w, ScrH() * h )
@@ -161,6 +161,6 @@ datapad.addApp({
 				w = 0.002
 				h = h + 0.058
 			end
-		end
+		end]]
 	end
 })
