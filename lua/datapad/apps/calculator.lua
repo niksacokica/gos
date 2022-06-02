@@ -1,3 +1,8 @@
+surface.CreateFont( "NumberFont", {
+	font = "Roboto",
+	size = 64
+})
+
 datapad.addApp({
 	["name"] = "Calculator",
 	["icon"] = "datapad/calculator.png",
@@ -35,132 +40,252 @@ datapad.addApp({
 			surface.DrawLine( w * 0.4, h * 0.65, w * 0.6, h * 0.35 )
 			surface.DrawLine( w * 0.41, h * 0.351, w * 0.61, h * 0.651 )
 			surface.DrawLine( w * 0.41, h * 0.651, w * 0.61, h * 0.351 )
-		end	
+		end
+		
+		local nums = vgui.Create( "DLabel", window )
+		nums:SetPos( ScrW() * 0.003, ScrH() * 0.06 )
+		nums:SetText( "0" )
+		nums:SetFont( "NumberFont" )
+		nums:SetTextColor( color_black )
+		nums:SetSize( ScrW() * 0.165, ScrH() * 0.04 )
+		nums:SetContentAlignment( 6 )
+		nums.result = false
+		
+		function nums:AppendChar( num )
+			local txt = nums:GetText()
+			if #txt > 9 or ( ( string.find( txt, "%." ) or not tonumber( string.Replace( txt, ",", "" ) ) ) and num == "." ) then return end
+			
+			if ( txt == "0" or not tonumber( string.Replace( txt, ",", "" ) ) ) and not ( num == "." ) or nums.result then
+				nums.result = false
+				nums:SetText( num )
+			else
+				nums:SetText( string.Comma( string.Replace( txt, ",", "" ) .. num ) )
+			end
+		end
+		
+		function nums:RemoveChar( num )
+			local txt = nums:GetText()
+			if txt == "0" then return end
+			
+			if #txt == 1 or ( #txt == 2 and txt[1] == "-" ) or num == #txt then
+				nums:SetText( "0" )
+			else
+				nums:SetText( string.Comma( string.Replace( string.Left( txt , #txt - num ), ",", "" ) ) )
+			end
+		end
+		
+		function nums:ToggleSign()
+			local txt = nums:GetText()
+			if txt == "0" then return end
+			
+			if not ( txt[1] == "-" ) then
+				nums:SetText( "-" .. txt )
+			else
+				nums:SetText( string.Comma( string.Replace( string.Right( txt , #txt - 1 ), ",", "" ) ) )
+			end
+		end
+		
 		local clrGrey = Color( 242, 242, 242 )
 		local buttons = {
-			[1] = {
+			{
 				["name"] = "%",
 				["clr"] = clrGrey
 			},
-			[2] = {
+			{
 				["name"] = "CE",
-				["clr"] = clrGrey
+				["clr"] = clrGrey,
+				["func"] = function()
+					nums:RemoveChar( #nums:GetText() )
+				end
 			},
-			[3] = {
+			{
 				["name"] = "C",
 				["clr"] = clrGrey
 			},
-			[4] = {
-				["name"] = "?",
-				["clr"] = clrGrey
+			{
+				["name"] = "DEL",
+				["clr"] = clrGrey,
+				["func"] = function()
+					nums:RemoveChar( 1 )
+				end
 			},
 			
-			[5] = {
+			{
 				["name"] = "1/X",
 				["clr"] = clrGrey
 			},
-			[6] = {
-				["name"] = "X^2",
-				["clr"] = clrGrey
+			{
+				["name"] = "x²",
+				["clr"] = clrGrey,
+				["func"] = function()
+					local num = string.Replace( nums:GetText(), ",", "" )
+					if not tonumber( num ) then return end
+					
+					nums.result = true
+					local res = tostring( num * num )
+					
+					if not tonumber( res ) then
+						nums:SetText( res )
+					else
+						if #res > 9 then
+							nums:SetText( string.Comma( string.sub( res, 1, #res - 9 ) ) )
+						else
+							nums:SetText( string.Comma( res ) )
+						end
+					end
+				end
 			},
-			[7] = {
-				["name"] = "?",
-				["clr"] = clrGrey
+			{
+				["name"] = "2√X",
+				["clr"] = clrGrey,
+				["func"] = function()
+					local num = string.Replace( nums:GetText(), ",", "" )
+					if not tonumber( num ) then return end
+				
+					local res = tostring( math.sqrt( num ) )
+					nums.result = true
+					
+					if tonumber( res ) then
+						nums:SetText( string.Comma( math.Round( res, math.min( #res, math.abs( #res - 10 ) ) ) ) )
+					else
+						nums:SetText( res )
+					end
+				end
 			},
-			[8] = {
-				["name"] = "?",
+			{
+				["name"] = "/",
 				["clr"] = clrGrey
 			},
 			
-			[9] = {
+			{
 				["name"] = "7",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 7 )
+				end
 			},
-			[10] = {
+			{
 				["name"] = "8",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 8 )
+				end
 			},
-			[11] = {
+			{
 				["name"] = "9",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 9 )
+				end
 			},
-			[12] = {
+			{
 				["name"] = "X",
 				["clr"] = clrGrey
 			},
 			
-			[13] = {
+			{
 				["name"] = "4",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 4 )
+				end
 			},
-			[14] = {
+			{
 				["name"] = "5",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 5 )
+				end
 			},
-			[15] = {
+			{
 				["name"] = "6",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 6 )
+				end
 			},
-			[16] = {
+			{
 				["name"] = "-",
 				["clr"] = clrGrey
 			},
 			
-			[17] = {
+			{
 				["name"] = "1",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 1 )
+				end
 			},
-			[18] = {
+			{
 				["name"] = "2",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 2 )
+				end
 			},
-			[19] = {
+			{
 				["name"] = "3",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 3 )
+				end
 			},
-			[20] = {
+			{
 				["name"] = "+",
 				["clr"] = clrGrey
 			},
 			
-			[21] = {
+			{
 				["name"] = "+/-",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:ToggleSign()
+				end
 			},
-			[22] = {
+			{
 				["name"] = "0",
-				["clr"] = color_white
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( 0 )
+				end
 			},
-			[23] = {
-				["name"] = ",",
-				["clr"] = color_white
+			{
+				["name"] = ".",
+				["clr"] = color_white,
+				["func"] = function()
+					nums:AppendChar( "." )
+				end
 			},
-			[24] = {
+			{
 				["name"] = "=",
-				["clr"] = clrGrey
+				["clr"] = Color( 153, 204, 234 )
 			}
 		}
 		
-		local w = 0.002
-		local h = 0.122
-		--[[for k, v in ipairs( buttons ) do			
-			local but = vgui.Create( "DButton", window )
+		local grid = vgui.Create( "DGrid", window )
+		grid:SetPos( ScrW() * 0.0025, ScrH() * 0.124 )
+		grid:SetCols( 4 )
+		grid:SetColWide( ScrW() * 0.0417 )
+		grid:SetRowHeight( ScrW() * 0.0323 )
+		
+		for k, v in ipairs( buttons ) do
+			local but = vgui.Create( "DButton" )
+			but:SetFont( "DermaLarge" )
 			but:SetText( v["name"] )
-			but:SetPos( ScrW() * w, ScrH() * h )
 			but:SetSize( ScrW() * 0.041, ScrH() * 0.056 )
 			
-			local hvr = v["clr"]
-			hvr.a = 100
-			but.Paint = function( self, w, h )
-				surface.SetDrawColor( but:IsHovered() and hvr or v["clr"] )
-				surface.DrawRect( 0, 0, w, h )
-			end	
+			grid:AddItem( but )
 			
-			w = w + 0.042
-			if w > 0.168 then
-				w = 0.002
-				h = h + 0.058
+			local hvrg = Color( 200, 200, 200 )
+			local hvrb = Color( 95, 185, 238 )
+			local pvrg = Color( 175, 175, 175 )
+			local pvrb = Color( 38, 166, 242 )
+			but.UpdateColours = function( self, skin ) end
+			but.Paint = function( self, w, h )
+				surface.SetDrawColor( ( but:IsDown() and ( v["name"] == "=" and pvrb or pvrg ) or ( but:IsHovered() and ( v["name"] == "=" and hvrb or hvrg ) or v["clr"] ) ):Unpack() )
+				surface.DrawRect( 0, 0, w, h )
 			end
-		end]]
+			but.DoClick = v["func"]
+		end
 	end
 })
