@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "time",
 	["creator"] = "niksacokica",
 	["description"] = "Displays the time.",

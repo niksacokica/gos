@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "help",
 	["creator"] = "niksacokica",
 	["description"] = "Provides help information for commands.",

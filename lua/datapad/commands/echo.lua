@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "echo",
 	["creator"] = "niksacokica",
 	["description"] = "Displays messages, or turns command echoing on or off.",

@@ -1,30 +1,30 @@
 datapad = istable( datapad ) and datapad or {}
 
-datapad.addApp = function( app )
-	datapad.apps = istable( datapad.apps ) and datapad.apps or {}
+function datapad:AddApp( app )
+	self.apps = istable( self.apps ) and self.apps or {}
 	
-	--if istable( datapad.apps[app["name"]] ) then
+	--if istable( self.apps[app["name"]] ) then
 		--ErrorNoHalt( "App with the name  '" .. app["name"] .. "'  already exists!" )
 	--else
-		datapad.apps[app["name"]] = app
+		self.apps[app["name"]] = app
 	--end
 end
 
-datapad.addCommand = function( cmd )
-	datapad.cmds = istable( datapad.cmds ) and datapad.cmds or {}
+function datapad:AddCommand( cmd )
+	self.cmds = istable( self.cmds ) and self.cmds or {}
 	
 	local cl = string.lower( cmd["cmd"] )
 	
-	--if istable( datapad.cmds[cl] ) then
+	--if istable( self.cmds[cl] ) then
 		--ErrorNoHalt( "Command with the name '" .. cl .. "' already exists!" )
 	--elseif #cl > 14 then
 		--ErrorNoHalt( "Command name '" .. cl .. "' is too long, max length is 14 characters!" )
 	--else
-		datapad.cmds[cl] = cmd
+		self.cmds[cl] = cmd
 	--end
 end
 
-datapad.executeCommand = function( cmd, window )
+function datapad:ExecuteCommand( cmd, window )
 	local cAf = string.Explode( " ", cmd )
 	for i=#cAf, 1, -1 do
 		if #cAf[i] == 0 then
@@ -33,33 +33,33 @@ datapad.executeCommand = function( cmd, window )
 	end
 	cAf[1] = string.lower( cAf[1] )
 	
-	if istable( datapad.cmds[cAf[1]] ) then return datapad.cmds[cAf[1]]["function"]( cAf, window ) end
+	if istable( self.cmds[cAf[1]] ) then return self.cmds[cAf[1]]["function"]( cAf, window ) end
 	
 	return "'" .. cAf[1] .. "' is not recognized as a command!\n"
 end
 
 local files, directories = file.Find( "datapad/*", "LUA" )
 
-for _, d in ipairs( directories ) do
-	if not ( d == "apps" ) and not ( d == "commands" ) then continue end
+for _, dir in ipairs( directories ) do
+	if not ( dir == "apps" ) and not ( dir == "commands" ) then continue end
 
-	files, directories = file.Find( "datapad/" .. d .. "/*.lua", "LUA" )
+	files, directories = file.Find( "datapad/" .. dir .. "/*.lua", "LUA" )
 	for _, v in ipairs( files ) do
-		include( "datapad/" .. d .. "/" .. v )
+		include( "datapad/" .. dir .. "/" .. v )
 	end
 end
 
-datapad.startApp = function( v )
+function datapad:StartApp ( v )
 	local window = vgui.Create( "DFrame" )
 	window:Center()
 	window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
-	window:SetParent( datapad.screen )
+	window:SetParent( self.screen )
 	window:MakePopup()
 	
 	function handleWindowClose()
-		for key, val in ipairs( datapad.screen.OpenApps ) do
+		for key, val in ipairs( self.screen.OpenApps ) do
 			if val[2] == v["name"] and val[1] == window then
-				table.remove( datapad.screen.OpenApps, key )
+				table.remove( self.screen.OpenApps, key )
 				
 				return
 			end
@@ -73,7 +73,7 @@ datapad.startApp = function( v )
 		handleWindowClose()
 	end
 	
-	table.insert( datapad.screen.OpenApps, { window, v["name"] } )
+	table.insert( self.screen.OpenApps, { window, v["name"] } )
 	v["window"]( window )
 	
 	return window
@@ -85,7 +85,7 @@ local function populateApps( grid )
 		app:SetText( "" )
 		app:SetSize( grid:GetColWide() - 50, grid:GetRowHeight() - 50 )
 		app.DoDoubleClick = function()
-			datapad.startApp( v )
+			datapad:StartApp( v )
 		end
 		
 		local app_icon = Material( v["icon"] )

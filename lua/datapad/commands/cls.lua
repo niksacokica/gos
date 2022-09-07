@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "cls",
 	["creator"] = "niksacokica",
 	["description"] = "Clears the screen.",

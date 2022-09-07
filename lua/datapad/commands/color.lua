@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "color",
 	["creator"] = "niksacokica",
 	["description"] = "Sets the default console foreground and background colors.",

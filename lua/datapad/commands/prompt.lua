@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "prompt",
 	["creator"] = "niksacokica",
 	["description"] = "Changes the command prompt.",

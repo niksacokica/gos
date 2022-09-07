@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "title",
 	["creator"] = "niksacokica",
 	["description"] = "Sets the window title for this session.",

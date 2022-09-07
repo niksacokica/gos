@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "tasklist",
 	["creator"] = "niksacokica",
 	["description"] = "Displays all currently running apps.",

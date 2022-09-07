@@ -1,10 +1,10 @@
 local files, directories = file.Find( "datapad/*", "LUA" )
 
-for _, d in ipairs( directories ) do
-	if not ( d == "apps" ) and not ( d == "commands" ) then continue end
+for _, dir in ipairs( directories ) do
+	if not ( dir == "apps" ) and not ( dir == "commands" ) then continue end
 
-	files, directories = file.Find( "datapad/" .. d .. "/*.lua", "LUA" )
+	files, directories = file.Find( "datapad/" .. dir .. "/*.lua", "LUA" )
 	for _, v in ipairs( files ) do
-		AddCSLuaFile( "datapad/" .. d .. "/" .. v )
+		AddCSLuaFile( "datapad/" .. dir .. "/" .. v )
 	end
 end

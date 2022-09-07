@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "timeout",
 	["creator"] = "niksacokica",
 	["description"] = "Pauses the command prompt for certain amount of time.",

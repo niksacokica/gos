@@ -3,7 +3,7 @@ surface.CreateFont( "NumberFont", {
 	size = 64
 })
 
-datapad.addApp({
+datapad:AddApp({
 	["name"] = "Calculator",
 	["icon"] = "datapad/calculator.png",
 	["creator"] = "niksacokica",
@@ -49,216 +49,351 @@ datapad.addApp({
 		nums:SetTextColor( color_black )
 		nums:SetSize( ScrW() * 0.165, ScrH() * 0.04 )
 		nums:SetContentAlignment( 6 )
-		nums.result = false
 		
-		function nums:AppendChar( num )
-			local txt = nums:GetText()
-			if #txt > 9 or ( ( string.find( txt, "%." ) or not tonumber( string.Replace( txt, ",", "" ) ) ) and num == "." ) then return end
+		local calc = {
+			decimals = 0,
+			decimal = false,
+			result = false,
+			value = 0,
+			res = 0,
+			tmp = nil,
+			action = "",
 			
-			if ( txt == "0" or not tonumber( string.Replace( txt, ",", "" ) ) ) and not ( num == "." ) or nums.result then
-				nums.result = false
-				nums:SetText( num )
-			else
-				nums:SetText( string.Comma( string.Replace( txt, ",", "" ) .. num ) )
-			end
-		end
-		
-		function nums:RemoveChar( num )
-			local txt = nums:GetText()
-			if txt == "0" then return end
+			["+"] = function( value, res )
+				return value + res
+			end,
 			
-			if #txt == 1 or ( #txt == 2 and txt[1] == "-" ) or num == #txt then
-				nums:SetText( "0" )
-			else
-				nums:SetText( string.Comma( string.Replace( string.Left( txt , #txt - num ), ",", "" ) ) )
-			end
-		end
-		
-		function nums:ToggleSign()
-			local txt = nums:GetText()
-			if txt == "0" then return end
+			["-"] = function( value, res )
+				return res - value
+			end,
 			
-			if not ( txt[1] == "-" ) then
-				nums:SetText( "-" .. txt )
-			else
-				nums:SetText( string.Comma( string.Replace( string.Right( txt , #txt - 1 ), ",", "" ) ) )
+			["X"] = function( value, res )
+				return value * res
+			end,
+			
+			["/"] = function( value, res )
+				return res / value
+			end,
+			
+			UpdateDisplay = function( self )
+				if self.value >= 10 ^ 99 or self.value <= -10 ^ 99 then
+					nums:SetText( string.Comma( string.format( "%.3e", self.value ) ) )
+				elseif self.value >= 10 ^ 9 or self.value <= -10 ^ 9 then
+					nums:SetText( string.Comma( string.format( "%.4e", self.value ) ) )
+				else
+					nums:SetText( string.Comma( self.decimals > 0 and string.format( "%.9g", self.value ) or self.value ) .. ( ( self.decimal and self.decimals == 0 ) and "." or "" ) )
+				end
+			end,
+			
+			AddNum = function( self, num )
+				if self.result or not self.value then
+					self.value = num
+					
+					self.decimals = 0
+					self.decimal = false
+					self.result = false
+				else	
+					if self.decimal then
+						self.decimals = self.decimals + 1
+					end
+					
+					self.value = self.value * ( self.decimal and 1 or 10 ) + ( self.value >= 0 and num or -num ) * 10 ^ -self.decimals
+				end
+				
+				self.tmp = self.value
+				self:UpdateDisplay( self )
+			end,
+			
+			AddDecimal = function( self )
+				if self.result or not self.value then
+					self.value = 0
+					
+					self.result = false
+				end
+				self.decimal = true
+				
+				self:UpdateDisplay()
+			end,
+			
+			ChangeSign = function( self )
+				self.value = self.value * -1
+				
+				self:UpdateDisplay()
+			end,
+			
+			CE = function( self )
+				self.value = 0
+				self.tmp = nil
+				self.decimals = 0
+				self.decimal = false
+				self.result = false
+					
+				self:UpdateDisplay()
+			end,
+			
+			C = function( self )
+				self:CE()
+				self.action = ""
+				self.res = 0
+					
+				self:UpdateDisplay()
+			end,
+			
+			DEL = function( self )
+				if not self.value then return end
+			
+				self.value = self.value > 0 and math.floor( self.value / 10 ) or math.ceil( self.value / 10 )
+				self.tmp = self.value
+					
+				self:UpdateDisplay()
+			end,
+			
+			Pow = function( self )
+				if not self.value then return end
+			
+				self.value = self.value * self.value
+				self.tmp = self.value
+				self.result = true
+					
+				self:UpdateDisplay()
+			end,
+			
+			Sqrt = function( self )
+				if not self.value then return end
+			
+				self.value = math.sqrt( self.value )
+				self.tmp = self.value
+				self.result = true
+					
+				self:UpdateDisplay()
+			end,
+			
+			Inv = function( self )
+				if not self.value then return end
+			
+				self.value = 1 / self.value
+				self.tmp = self.value
+				self.result = true
+					
+				self:UpdateDisplay()
+			end,
+			
+			BasicMath = function( self, val )
+				self.tmp = self.value and self.value or self.tmp
+			
+				if self.action ~= "" and self.value then
+					self.value = self[self.action]( self.value, self.res )
+				end
+				
+				self.action = val
+				if not self.value then return end
+				
+				self:UpdateDisplay()
+				self.res = self.value
+				self.value = nil
+			end,
+			
+			Eq = function( self )
+				self.result = true
+			
+				self.value = self.tmp
+				if self.action ~= "" and self.tmp then
+					self.value = self[self.action]( self.value, self.res )
+				end
+				
+				if not self.value then return end
+				
+				self:UpdateDisplay()
+				self.res = self.value
+				self.value = nil
+			end,
+			
+			Percentage = function( self )			
+				if not self.value then return end
+				
+				local tmp = self.value
+				self.value = self.res / 100 * self.value
+				
+				self:UpdateDisplay()
+				self.res = self.value
+				self.value = tmp
 			end
-		end
+		}
 		
 		local clrGrey = Color( 242, 242, 242 )
 		local buttons = {
-			{
-				["name"] = "%",
-				["clr"] = clrGrey
-			},
-			{
-				["name"] = "CE",
+			["%"] = {
+				["pos"] = 1,
 				["clr"] = clrGrey,
 				["func"] = function()
-					nums:RemoveChar( #nums:GetText() )
+					calc:Percentage()
 				end
 			},
-			{
-				["name"] = "C",
-				["clr"] = clrGrey
-			},
-			{
-				["name"] = "DEL",
+			["CE"] = {
+				["pos"] = 2,
 				["clr"] = clrGrey,
 				["func"] = function()
-					nums:RemoveChar( 1 )
+					calc:CE()
 				end
 			},
-			
-			{
-				["name"] = "1/X",
-				["clr"] = clrGrey
-			},
-			{
-				["name"] = "x²",
+			["C"] = {
+				["pos"] = 3,
 				["clr"] = clrGrey,
 				["func"] = function()
-					local num = string.Replace( nums:GetText(), ",", "" )
-					if not tonumber( num ) then return end
-					
-					nums.result = true
-					local res = tostring( num * num )
-					
-					if not tonumber( res ) then
-						nums:SetText( res )
-					else
-						if #res > 9 then
-							nums:SetText( string.Comma( string.sub( res, 1, #res - 9 ) ) )
-						else
-							nums:SetText( string.Comma( res ) )
-						end
-					end
+					calc:C()
 				end
 			},
-			{
-				["name"] = "2√X",
+			["DEL"] = {
+				["pos"] = 4,
 				["clr"] = clrGrey,
 				["func"] = function()
-					local num = string.Replace( nums:GetText(), ",", "" )
-					if not tonumber( num ) then return end
-				
-					local res = tostring( math.sqrt( num ) )
-					nums.result = true
-					
-					if tonumber( res ) then
-						nums:SetText( string.Comma( math.Round( res, math.min( #res, math.abs( #res - 10 ) ) ) ) )
-					else
-						nums:SetText( res )
-					end
+					calc:DEL()
 				end
-			},
-			{
-				["name"] = "/",
-				["clr"] = clrGrey
 			},
 			
-			{
-				["name"] = "7",
-				["clr"] = color_white,
+			["1/X"] = {
+				["pos"] = 5,
+				["clr"] = clrGrey,
 				["func"] = function()
-					nums:AppendChar( 7 )
+					calc:Inv()
 				end
 			},
-			{
-				["name"] = "8",
-				["clr"] = color_white,
+			["x²"] = {
+				["pos"] = 6,
+				["clr"] = clrGrey,
 				["func"] = function()
-					nums:AppendChar( 8 )
+					calc:Pow()
 				end
 			},
-			{
-				["name"] = "9",
-				["clr"] = color_white,
+			["2√X"] = {
+				["pos"] = 7,
+				["clr"] = clrGrey,
 				["func"] = function()
-					nums:AppendChar( 9 )
+					calc:Sqrt()
 				end
 			},
-			{
-				["name"] = "X",
-				["clr"] = clrGrey
+			["/"] = {
+				["pos"] = 8,
+				["clr"] = clrGrey,
+				["func"] = function()
+					calc:BasicMath( "/" )
+				end
 			},
 			
-			{
-				["name"] = "4",
+			["7"] = {
+				["pos"] = 9,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( 4 )
+					calc:AddNum( 7 )
 				end
 			},
-			{
-				["name"] = "5",
+			["8"] = {
+				["pos"] = 10,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( 5 )
+					calc:AddNum( 8 )
 				end
 			},
-			{
-				["name"] = "6",
+			["9"] = {
+				["pos"] = 11,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( 6 )
+					calc:AddNum( 9 )
 				end
 			},
-			{
-				["name"] = "-",
-				["clr"] = clrGrey
+			["X"] = {
+				["pos"] = 12,
+				["clr"] = clrGrey,
+				["func"] = function()
+					calc:BasicMath( "X" )
+				end
 			},
 			
-			{
-				["name"] = "1",
+			["4"] = {
+				["pos"] = 13,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( 1 )
+					calc:AddNum( 4 )
 				end
 			},
-			{
-				["name"] = "2",
+			["5"] = {
+				["pos"] = 14,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( 2 )
+					calc:AddNum( 5 )
 				end
 			},
-			{
-				["name"] = "3",
+			["6"] = {
+				["pos"] = 15,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( 3 )
+					calc:AddNum( 6 )
 				end
 			},
-			{
-				["name"] = "+",
-				["clr"] = clrGrey
+			["-"] = {
+				["pos"] = 16,
+				["clr"] = clrGrey,
+				["func"] = function()
+					calc:BasicMath( "-" )
+				end
 			},
 			
-			{
-				["name"] = "+/-",
+			["1"] = {
+				["pos"] = 17,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:ToggleSign()
+					calc:AddNum( 1 )
 				end
 			},
-			{
-				["name"] = "0",
+			["2"] = {
+				["pos"] = 18,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( 0 )
+					calc:AddNum( 2 )
 				end
 			},
-			{
-				["name"] = ".",
+			["3"] = {
+				["pos"] = 19,
 				["clr"] = color_white,
 				["func"] = function()
-					nums:AppendChar( "." )
+					calc:AddNum( 3 )
 				end
 			},
-			{
-				["name"] = "=",
-				["clr"] = Color( 153, 204, 234 )
+			["+"] = {
+				["pos"] = 20,
+				["clr"] = clrGrey,
+				["func"] = function()
+					calc:BasicMath( "+" )
+				end
+			},
+			
+			["+/-"] = {
+				["pos"] = 21,
+				["clr"] = color_white,
+				["func"] = function()
+					calc:ChangeSign()
+				end
+			},
+			["0"] = {
+				["pos"] = 22,
+				["clr"] = color_white,
+				["func"] = function()	
+					calc:AddNum( 0 )
+				end
+			},
+			["."] = {
+				["pos"] = 23,
+				["clr"] = color_white,
+				["func"] = function()
+					calc:AddDecimal()
+				end
+			},
+			["="] = {
+				["pos"] = 24,
+				["clr"] = Color( 153, 204, 234 ),
+				["func"] = function()
+					calc:Eq()
+				end
 			}
 		}
 		
@@ -268,10 +403,10 @@ datapad.addApp({
 		grid:SetColWide( ScrW() * 0.0417 )
 		grid:SetRowHeight( ScrW() * 0.0323 )
 		
-		for k, v in ipairs( buttons ) do
+		for k, v in SortedPairsByMemberValue( buttons, "pos" ) do
 			local but = vgui.Create( "DButton" )
 			but:SetFont( "DermaLarge" )
-			but:SetText( v["name"] )
+			but:SetText( k )
 			but:SetSize( ScrW() * 0.041, ScrH() * 0.056 )
 			
 			grid:AddItem( but )
@@ -282,10 +417,51 @@ datapad.addApp({
 			local pvrb = Color( 38, 166, 242 )
 			but.UpdateColours = function( self, skin ) end
 			but.Paint = function( self, w, h )
-				surface.SetDrawColor( ( but:IsDown() and ( v["name"] == "=" and pvrb or pvrg ) or ( but:IsHovered() and ( v["name"] == "=" and hvrb or hvrg ) or v["clr"] ) ):Unpack() )
+				surface.SetDrawColor( ( but:IsDown() and ( k == "=" and pvrb or pvrg ) or ( but:IsHovered() and ( k== "=" and hvrb or hvrg ) or v["clr"] ) ):Unpack() )
 				surface.DrawRect( 0, 0, w, h )
 			end
 			but.DoClick = v["func"]
+		end
+		
+		local keyCodes = {
+			["1"] = "0",
+			["2"] = "1",
+			["3"] = "2",
+			["4"] = "3",
+			["5"] = "4",
+			["6"] = "5",
+			["7"] = "6",
+			["8"] = "7",
+			["9"] = "8",
+			["10"] = "9",
+			["37"] = "0",
+			["38"] = "1",
+			["39"] = "2",
+			["40"] = "3",
+			["41"] = "4",
+			["42"] = "5",
+			["43"] = "6",
+			["44"] = "7",
+			["45"] = "8",
+			["46"] = "9",
+			["47"] = "/",
+			["48"] = "X",
+			["49"] = "-",
+			["50"] = "+",
+			["51"] = "=",
+			["52"] = ".",
+			["58"] = ".",
+			["59"] = ".",
+			["62"] = "+",
+			["63"] = "=",
+			["64"] = "=",
+			["66"] = "DEL",
+			["73"] = "C",
+		}
+		function window:OnKeyCodePressed( key )
+			if keyCodes[tostring( key )] then
+				buttons[keyCodes[tostring( key )]]["func"]()	
+			end
 		end
 	end
 })

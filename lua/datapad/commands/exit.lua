@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "exit",
 	["creator"] = "niksacokica",
 	["description"] = "Exits the command prompt.",

@@ -1,12 +1,12 @@
-datapad.addApp({
+datapad:AddApp({
 	["name"] = "Command Prompt",
 	["icon"] = "datapad/command_prompt.png",
 	["creator"] = "niksacokica",
-	["window"] = function( window )		
+	["window"] = function( window )
 		window:SetPos( ScrW() * 0.3, ScrH() * 0.3 )
 		window:SetSize( ScrW() * 0.4, ScrH() * 0.4 )
-		window:SetTitle( "" )
 		window:ShowCloseButton( false )
+		window:SetTitle( "" )
 		window.title = "Command Prompt"
 		window.echo = true
 		window.echoString = LocalPlayer():GetName() .. ">"
@@ -131,7 +131,7 @@ datapad.addApp({
 				end
 				
 				if #command > 0 then
-					window:executeCommand( command )
+					window:ExecuteCommand( command )
 				end
 				
 				return true
@@ -188,10 +188,10 @@ datapad.addApp({
 			background_color = clr
 		end
 		function window:SetWindowTitle( str )
-			window.title = str
+			self.title = str
 		end
 		function window:GetWindowTitle()
-			return window.title
+			return self.title
 		end
 		function window:ShouldPrint( bool )
 			pressToContinue = not bool
@@ -201,36 +201,36 @@ datapad.addApp({
 			ignore = bool
 		end
 		function window:SetEcho( bool )
-			window.echo = bool
+			self.echo = bool
 		end
 		function window:GetEcho()
-			return window.echo
+			return self.echo
 		end
 		function window:SetEchoString( str )
-			window.echoString = str
+			self.echoString = str
 		end
 		function window:ResetEchoString()
-			window.echoString = LocalPlayer():GetName() .. ">" 
+			self.echoString = LocalPlayer():GetName() .. ">" 
 		end
 		function window:GetEchoString()
-			return window.echoString
+			return self.echoString
 		end
-		function window:executeCommand( cmd )
-			local ex = datapad.executeCommand( cmd, window )
+		function window:ExecuteCommand( cmd )
+			local ex = datapad:ExecuteCommand( cmd, self )
 			if ex == nil then return end
 			ex = tostring( ex )
-				
+			
 			if not pressToContinue then
-				txt:SetText( txt:GetText() .. "\n" .. ( #ex > 0 and ex .. "\n" or ex ) .. ( window.echo and window.echoString or "" ) )
-				window.noDel = #txt:GetText()
-				txt:SetCaretPos( window.noDel )
+				txt:SetText( txt:GetText() .. "\n" .. ( #ex > 0 and ex .. "\n" or ex ) .. ( self.echo and window.echoString or "" ) )
+				self.noDel = #txt:GetText()
+				txt:SetCaretPos( self.noDel )
 				curTxt = txt:GetText()
 			end
 		end
 		function window:appendText( text )
 			txt:SetText( txt:GetText() .. text )
-			window.noDel = #txt:GetText()
-			txt:SetCaretPos( window.noDel )
+			self.noDel = #txt:GetText()
+			txt:SetCaretPos( self.noDel )
 			curTxt = txt:GetText()
 		end
 	end

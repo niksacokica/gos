@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "taskkill",
 	["creator"] = "niksacokica",
 	["description"] = "Stop a running app.",

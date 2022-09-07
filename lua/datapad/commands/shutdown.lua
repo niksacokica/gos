@@ -1,4 +1,4 @@
-datapad.addCommand({
+datapad:AddCommand({
 	["cmd"] = "shutdown",
 	["creator"] = "niksacokica",
 	["description"] = "Turns off the datapad.",
