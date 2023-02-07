@@ -19,12 +19,12 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( background_color )
-			surface.DrawRect( w * 0.004, h * 0.003, w * 0.996, h * 0.997 )
+			surface.DrawRect( w * 0.004, h * 0.002, w * 0.997, h * 0.998 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
 		cls:SetText( "" )
-		cls:SetPos( ScrW() * 0.1444, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.1446, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.025, ScrH() * 0.03 )
 		cls.DoClick = function()
 			window:Close()
@@ -35,11 +35,10 @@ datapad:AddApp({
 			surface.SetDrawColor( cls:IsHovered() and color_red or xClr )
 			surface.DrawRect( 0, 0, w, h )
 			
+			draw.NoTexture()
 			surface.SetDrawColor( color_black )
-			surface.DrawLine( w * 0.4, h * 0.35, w * 0.6, h * 0.65 )
-			surface.DrawLine( w * 0.4, h * 0.65, w * 0.6, h * 0.35 )
-			surface.DrawLine( w * 0.41, h * 0.351, w * 0.61, h * 0.651 )
-			surface.DrawLine( w * 0.41, h * 0.651, w * 0.61, h * 0.351 )
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.04, h * 0.5, -45 )
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.04, h * 0.5, 45 )
 		end
 		
 		local nums = vgui.Create( "DLabel", window )

@@ -18,10 +18,10 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( background_color )
-			surface.DrawRect( w * 0.002, h * 0.074, w * 0.998, h * 0.926 )
+			surface.DrawRect( w * 0.001, h * 0.072, w * 0.999, h * 0.928 )
 			
 			surface.SetDrawColor( color_white )
-			surface.DrawRect( w * 0.002, h * 0.003, w * 0.998, h * 0.07 )
+			surface.DrawRect( w * 0.001, h * 0.003, w * 0.999, h * 0.07 )
 			
 			surface.SetFont( "DermaDefaultBold" )
 			surface.SetTextColor( color_black )
@@ -35,7 +35,7 @@ datapad:AddApp({
 		
 		local cls = vgui.Create( "DButton", window )
 		cls:SetText( "" )
-		cls:SetPos( ScrW() * 0.3777, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.3778, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()
@@ -45,11 +45,10 @@ datapad:AddApp({
 			surface.SetDrawColor( cls:IsHovered() and color_red or color_white )
 			surface.DrawRect( 0, 0, w, h )
 			
-			surface.SetDrawColor( color_black )
-			surface.DrawLine( w * 0.4, h * 0.35, w * 0.6, h * 0.65 )
-			surface.DrawLine( w * 0.4, h * 0.65, w * 0.6, h * 0.35 )
-			surface.DrawLine( w * 0.41, h * 0.351, w * 0.61, h * 0.651 )
-			surface.DrawLine( w * 0.41, h * 0.651, w * 0.61, h * 0.351 )
+			draw.NoTexture()
+			surface.SetDrawColor(color_black)
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
 		end		
 		
 		local txt = vgui.Create( "DTextEntry", window )

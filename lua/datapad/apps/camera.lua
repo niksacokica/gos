@@ -14,7 +14,7 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.002, h * 0.003, w * 0.998, h * 0.997 )
+			surface.DrawRect( w * 0.001, h * 0.002, w * 0.999, h * 0.998 )
 			
 			local x, y = self:GetPos()
 			
@@ -42,12 +42,11 @@ datapad:AddApp({
 			surface.SetDrawColor( cls:IsHovered() and color_red or back_clr )
 			surface.DrawRect( 0, 0, w, h )
 			
+			draw.NoTexture()
 			surface.SetDrawColor( color_white )
-			surface.DrawLine( w * 0.4, h * 0.35, w * 0.6, h * 0.65 )
-			surface.DrawLine( w * 0.4, h * 0.65, w * 0.6, h * 0.35 )
-			surface.DrawLine( w * 0.41, h * 0.351, w * 0.61, h * 0.651 )
-			surface.DrawLine( w * 0.41, h * 0.651, w * 0.61, h * 0.351 )
-		end	
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+		end
 		
 		local noHUD = false
 		local photo = vgui.Create( "DButton", window )
