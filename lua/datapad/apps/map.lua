@@ -8,8 +8,9 @@ datapad:AddApp({
 		window:ShowCloseButton( false )
 		window:SetTitle( "" )
 		
+		local camPos = LocalPlayer():GetPos() + Vector(0, 0, 1000)		
+		
 		local back_clr = Color( 50, 50, 50 )
-		local camPos = LocalPlayer():GetPos() + Vector(0, 0, 1000)
 		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
