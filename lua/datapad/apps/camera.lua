@@ -48,7 +48,7 @@ datapad:AddApp({
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
 		end
 		
-		local noHUD = false
+		local pic = false
 		local photo = vgui.Create( "DButton", window )
 		photo:SetText( "" )
 		photo:SetPos( ScrW() * 0.424, ScrH() * 0.2 )
@@ -56,37 +56,32 @@ datapad:AddApp({
 		photo.DoClick = function()
 			LocalPlayer():DrawViewModel( false )
 			window:GetParent():Hide()
-			noHUD = true
+			
+			pic = true
 			
 			LocalPlayer():ConCommand( "jpeg" )
 			
 			timer.Simple( 1, function()
-				noHUD = false
+				pic = false
 				window:GetParent():Show()
 				LocalPlayer():DrawViewModel( true )
 			end )
 		end
 		
 		hook.Add( "HUDShouldDraw", "CamNoHUD", function()
-			if noHUD then
+			if pic then
 				return false
 			end
 		end )
 		
-		function surface.DrawCircleFilled( x, y, radius, seg )
-			local cir = {}
-
-			table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
-			for i = 0, seg do
-				local a = math.rad( ( i / seg ) * -360 )
-				table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+		local plyAngles = LocalPlayer():LocalEyeAngles()
+		hook.Add( "CreateMove", "CamFreeze", function( cmd )
+			if pic then
+				cmd:SetViewAngles( plyAngles )
+				cmd:ClearButtons()
+				cmd:ClearMovement()
 			end
-
-			local a = math.rad( 0 )
-			table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
-
-			surface.DrawPoly( cir )
-		end
+		end )
 		
 		photo.Paint = function( self, w, h )
 			draw.NoTexture()
