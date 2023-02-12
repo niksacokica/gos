@@ -14,8 +14,18 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.001, h * 0.002, w * 0.999, h * 0.998 )
+			surface.DrawRect( w * 0.001, h * 0.002, w * 0.999, h * 0.056 )
 		end
+		
+		local html = vgui.Create( "DHTML", window )
+		html:SetPos( ScrW() * 0.0005, ScrH() * 0.029 )
+		html:SetSize( ScrW() * 0.4995, ScrH() * 0.471 )
+		html:OpenURL( "http://wiki.garrysmod.com" )
+		
+		local ctrls = vgui.Create( "DHTMLControls", window )
+		ctrls:SetPos( ScrW() * 0.0005, ScrH() * 0.001 )
+		ctrls:SetSize( ScrW() * 0.4995, ScrH() * 0.028 )
+		ctrls:SetHTML( html )
 		
 		local cls = vgui.Create( "DButton", window )
 		cls:SetText( "" )

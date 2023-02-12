@@ -8,8 +8,26 @@ datapad:AddApp({
 		window:ShowCloseButton( false )
 		window:SetTitle( "" )
 		window.title = "Command Prompt"
+		window.curDir = "personal_files"
+		
+		function window:getCurrentDir()
+			local str, _ = string.gsub( window:getTrueCurrentDir(), "personal_files", LocalPlayer():GetName(), 1 )
+			return str
+		end
+		function window:getTrueCurrentDir()
+			return window.curDir
+		end
+		function window:setCurrentDir( dir )
+			local tmp = window:getCurrentDir()
+			window.curDir = dir
+			
+			if string.StartsWith( window.echoString, tmp ) then
+				window.echoString = window:getCurrentDir() .. ">"
+			end
+		end
+		
 		window.echo = true
-		window.echoString = LocalPlayer():GetName() .. ">"
+		window.echoString = window:getCurrentDir() .. ">"
 		window.noDel = #window.echoString
 		
 		local background_color = color_black
@@ -93,7 +111,7 @@ datapad:AddApp({
 		end
 		txt.OnKeyCodeTyped = function( self, kc )			
 			if pressToContinue then
-				if ignore and not ( kc == 67 ) then return true end
+				if ignore and not ( kc == KEY_TAB ) then return true end
 				
 				if timer.Exists( "DatapadTimeout" .. LocalPlayer():EntIndex() ) then
 					timer.Remove( "DatapadTimeout" .. LocalPlayer():EntIndex() )
@@ -112,14 +130,14 @@ datapad:AddApp({
 			local s, e = txt:GetSelectedTextRange()
 			s = ( s == 0 || s == e ) and txt:GetCaretPos() or s
 			
-			if ( kc == 66 and s < window.noDel + ( ( s == e || e == 0 ) and 1 or 0 ) ) || ( kc == 73 and s < window.noDel ) then
+			if ( kc == KEY_BACKSPACE and s < window.noDel + ( ( s == e || e == 0 ) and 1 or 0 ) ) || ( kc == KEY_DELETE and s < window.noDel ) then
 				if not ( s == e ) and not ( e == 0 ) then
 					txt:SetText( curTxt )
 					txt:SetCaretPos( window.noDel )
 				end
 				
 				return true
-			elseif kc == 64 then
+			elseif kc == KEY_ENTER then
 				local text = txt:GetText()
 				local command = string.sub( text, window.noDel + 1)
 				
@@ -134,18 +152,18 @@ datapad:AddApp({
 				end
 				
 				return true
-			elseif kc == 88 then
+			elseif kc == KEY_UP then
 				if hPos > 1 then
 					hPos = hPos - 1
 				end
 				
-				if history then
+				if #history > 0 then
 					txt:SetText( curTxt .. history[hPos] )
 					txt:SetCaretPos( string.len( txt:GetText() ) )
 				end
 				
 				return true
-			elseif kc == 90 then
+			elseif kc == KEY_DOWN then
 				if hPos < #history then
 					hPos = hPos + 1
 					
@@ -209,7 +227,7 @@ datapad:AddApp({
 			self.echoString = str
 		end
 		function window:ResetEchoString()
-			self.echoString = LocalPlayer():GetName() .. ">" 
+			self.echoString = window:getCurrentDir() .. ">" 
 		end
 		function window:GetEchoString()
 			return self.echoString
@@ -232,5 +250,39 @@ datapad:AddApp({
 			txt:SetCaretPos( self.noDel )
 			curTxt = txt:GetText()
 		end
+		function window:removeText( charNum )
+			txt:SetText( string.Left( txt:GetText(), #txt:GetText() - charNum ) )
+			self.noDel = #txt:GetText()
+			txt:SetCaretPos( self.noDel )
+			curTxt = txt:GetText()
+		end
 	end
 })
+
+function datapad:AddCommand( cmd )
+	self.cmds = istable( self.cmds ) and self.cmds or {}
+	
+	local cl = string.lower( cmd["cmd"] )
+	
+	--if istable( self.cmds[cl] ) then
+		--ErrorNoHalt( "Command with the name '" .. cl .. "' already exists!" )
+	--elseif #cl > 14 then
+		--ErrorNoHalt( "Command name '" .. cl .. "' is too long, max length is 14 characters!" )
+	--else
+		self.cmds[cl] = cmd
+	--end
+end
+
+function datapad:ExecuteCommand( cmd, window )
+	local cAf = string.Explode( " ", cmd )
+	for i=#cAf, 1, -1 do
+		if #cAf[i] == 0 then
+			table.remove( cAf, i )
+		end
+	end
+	cAf[1] = string.lower( cAf[1] )
+	
+	if istable( self.cmds[cAf[1]] ) then return self.cmds[cAf[1]]["function"]( cAf, window ) end
+	
+	return "'" .. cAf[1] .. "' is not recognized as a command!\n"
+end

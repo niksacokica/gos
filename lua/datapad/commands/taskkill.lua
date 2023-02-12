@@ -12,7 +12,7 @@ datapad:AddCommand({
 		
 		if not ( ( #args == 3 and string.upper( args[2] ) == "/ID" and num ) ||
 			( #args > 2 and string.upper( args[2] ) == "/FI" ) ) then
-			return window:executeCommand( "help taskkill" )
+			return window:ExecuteCommand( "help taskkill" )
 		end
 		
 		local ret = ""

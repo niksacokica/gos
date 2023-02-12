@@ -67,6 +67,6 @@ datapad:AddCommand({
 			end
 		end
 		
-		return window:executeCommand( "help shutdown" )
+		return window:ExecuteCommand( "help shutdown" )
 	end
 })

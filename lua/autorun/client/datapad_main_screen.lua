@@ -10,39 +10,9 @@ function datapad:AddApp( app )
 	--end
 end
 
-function datapad:AddCommand( cmd )
-	self.cmds = istable( self.cmds ) and self.cmds or {}
-	
-	local cl = string.lower( cmd["cmd"] )
-	
-	--if istable( self.cmds[cl] ) then
-		--ErrorNoHalt( "Command with the name '" .. cl .. "' already exists!" )
-	--elseif #cl > 14 then
-		--ErrorNoHalt( "Command name '" .. cl .. "' is too long, max length is 14 characters!" )
-	--else
-		self.cmds[cl] = cmd
-	--end
-end
-
-function datapad:ExecuteCommand( cmd, window )
-	local cAf = string.Explode( " ", cmd )
-	for i=#cAf, 1, -1 do
-		if #cAf[i] == 0 then
-			table.remove( cAf, i )
-		end
-	end
-	cAf[1] = string.lower( cAf[1] )
-	
-	if istable( self.cmds[cAf[1]] ) then return self.cmds[cAf[1]]["function"]( cAf, window ) end
-	
-	return "'" .. cAf[1] .. "' is not recognized as a command!\n"
-end
-
 local files, directories = file.Find( "datapad/*", "LUA" )
 
 for _, dir in ipairs( directories ) do
-	if not ( dir == "apps" ) and not ( dir == "commands" ) then continue end
-
 	files, directories = file.Find( "datapad/" .. dir .. "/*.lua", "LUA" )
 	for _, v in ipairs( files ) do
 		include( "datapad/" .. dir .. "/" .. v )
@@ -116,14 +86,9 @@ local function createScreen()
 	background.OpenApps = {}
 	datapad.screen = background
 	
-	--local datapad_screen_effect = Material( "niksacokica/datapad/datapad_screen_effect" )
 	background.Paint = function( self, w, h )
 		surface.SetDrawColor( background_clr )
 		surface.DrawRect( 0, 0, w, h )
-		
-		--surface.SetDrawColor( color_white )
-		--surface.SetMaterial( datapad_screen_effect )
-		--surface.DrawTexturedRect( 0, 0, w, h )
 	end
 	
 	background.OnClose = function()
@@ -140,23 +105,6 @@ local function createScreen()
 end
 
 hook.Add( "DatapadTrigger", "DatapadTriggerMain", createScreen )
-
-local tmr = CurTime()
-matproxy.Add({
-    name = "DatapadScreen", 
-    init = function( self, mat, values )
-    end,
-    bind = function( self, mat, ent )
-		if mat:GetName() == "niksacokica/datapad/datapad_screen_effect" and tmr < CurTime() then
-			tmr = CurTime() + 0.3
-			
-			local matrix = mat:GetMatrix( "$basetexturetransform" )
-			matrix:Translate( Vector( 0, math.random( -1000, 1000 ), 0 ) )
-			
-			mat:SetMatrix( "$basetexturetransform", matrix )
-		end
-	end 
-})
 
 function surface.DrawCircleFilled( x, y, radius, seg )
 	local cir = {}

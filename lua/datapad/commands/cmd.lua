@@ -32,12 +32,12 @@ datapad:AddCommand({
 				
 				if ( #tIsSet == 2 and string.upper( tIsSet[1] ) == string.upper( tIsSet[2] ) ) ||
 					not string.match( string.upper( tIsSet ), "^[0-9A-F]+$", 1 ) then
-					return window:executeCommand( "help cmd" )
+					return window:ExecuteCommand( "help cmd" )
 				end
 			elseif string.upper( args[i] ) == "/Q" and not qIsSet then
 				qIsSet = true
 			else
-				return window:executeCommand( "help cmd" )
+				return window:ExecuteCommand( "help cmd" )
 			end
 		end
 		
@@ -46,21 +46,21 @@ datapad:AddCommand({
 			newApp.noDel = 0
 			newApp:SetEcho( false )
 			
-			newApp:executeCommand( "cls" )
+			newApp:ExecuteCommand( "cls" )
 		end
 		if #tIsSet > 0 then
 			newApp:appendText( "color " .. tIsSet )
-			newApp:executeCommand( "color " .. tIsSet )
-			newApp:executeCommand( "cls" )
+			newApp:ExecuteCommand( "color " .. tIsSet )
+			newApp:ExecuteCommand( "cls" )
 		end
 		if cIsSet || kIsSet then
 			local str = table.concat( args, " ", ckKey )
 			for k, v in ipairs( string.Split( str, "&&" ) ) do
-				newApp:executeCommand( v )
+				newApp:ExecuteCommand( v )
 			end
 			
 			if cIsSet then
-				newApp:executeCommand( "exit" )
+				newApp:ExecuteCommand( "exit" )
 			end
 		end
 		

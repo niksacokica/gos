@@ -49,6 +49,6 @@ datapad:AddCommand({
 			end
 		end
 		
-		return window:executeCommand( "help color" )
+		return window:ExecuteCommand( "help color" )
 	end
 })

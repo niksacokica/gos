@@ -45,6 +45,6 @@ datapad:AddCommand({
 			end
 		end
 		
-		return window:executeCommand( "help timeout" )
+		return window:ExecuteCommand( "help timeout" )
 	end
 })

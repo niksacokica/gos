@@ -7,7 +7,7 @@ datapad:AddCommand({
 		"                           the name specified by the filter.",
 	["function"] = function( args, window )
 		if #args == 2 || ( #args > 1 and not ( string.upper( args[2] ) == "/FI" ) ) then
-			return window:executeCommand( "help tasklist" )
+			return window:ExecuteCommand( "help tasklist" )
 		end
 		
 		local ret = ""
