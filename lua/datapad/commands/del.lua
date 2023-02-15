@@ -21,14 +21,36 @@ datapad:AddCommand({
 				table.remove( args )
 			end
 			
-			local path = "datapad" .. "/" .. window:getTrueCurrentDir() .. "/" .. table.concat( args, " " )
-			if not file.Exists( path, "DATA" ) then return "The system cannot find the path specified.\n"
-			elseif file.IsDir( path, "DATA" ) then
-				local tab1, tab2 = file.Find( name, "DATA" )
-				PrintTable(tab1)
-				PrintTable(tab2)
+			local path = table.concat( args, " " )
+			local fullPath = "datapad" .. "/" .. window:getTrueCurrentDir() .. "/" .. path
+			if file.IsDir( fullPath, "DATA" ) then return window:ExecuteCommand( "rmdir" .. ( all and " /S " or " " ) .. path )
+			else
+				local function delAll( path, fileName )
+					local _, dirs = file.Find( path .. "*", "DATA" )
+					local files, _ = file.Find( path .. fileName, "DATA" )
+					
+					for k, v in ipairs( files ) do
+						file.Delete( path .. v )
+					end
+					
+					for k, v in ipairs( dirs ) do
+						delAll( path .. v .. "/", fileName )
+						file.Delete( path .. v )
+					end
+				end
+				
+				local pathNoFile = string.GetPathFromFilename( fullPath )
+				local files, dirs = file.Find( fullPath, "DATA" )
+				for k, v in ipairs( files ) do
+					file.Delete( pathNoFile .. "/" .. v )
+				end
+			
+				if all then
+					delAll( pathNoFile, string.GetFileFromFilename( fullPath ) )
+				end
 			end
 			
+			window:appendText( "\n" )
 			return ""
 		end
 	

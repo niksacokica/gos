@@ -15,7 +15,7 @@ datapad:AddCommand({
 	["function"] = function( args, window )	
 		table.remove( args, 1 )
 		
-		local active = {
+		local flags = {
 			["path"] = "",
 			["/B"] = false,
 			["/C"] = false,
@@ -41,11 +41,11 @@ datapad:AddCommand({
 				
 				if not validSorts[sort] then return window:ExecuteCommand( "help dir" ) end
 			
-				active["/O"] = sort
-			elseif not ( active[v] == nil ) then
-				active[v] = true
+				flags["/O"] = sort
+			elseif not ( flags[v] == nil ) then
+				flags[v] = true
 			elseif not string.StartsWith( v, "/" ) then
-				active["path"] = active["path"] .. ( #active["path"] > 0 and " " or "" ) .. string.lower( v )
+				flags["path"] = flags["path"] .. ( #flags["path"] > 0 and " " or "" ) .. string.lower( v )
 			end
 		end
 		
@@ -72,18 +72,18 @@ datapad:AddCommand({
 				table.insert( data, {
 					["date"] = os.date( "%d.%m.%Y.  %H:%M", file.Time( f, "DATA" )  ),
 					["dir"] = isDir,
-					["size"] = active["/C"] and string.Comma( fileSize, "." ) or fileSize,
-					["name"] = active["/L"] and string.upper( v ) or v
+					["size"] = flags["/C"] and string.Comma( fileSize, "." ) or fileSize,
+					["name"] = flags["/L"] and string.upper( v ) or v
 				})
 			end
 
 			local localPath = LocalPlayer():GetName() .. string.Right( path, #path - 22 )
-			return { ["path"] = active["/L"] and string.upper( localPath ) or localPath, ["data"] = data, ["numFiles"] = #files - #dirs, ["numDirs"] = #dirs + ( parentData and 1 or 0 ), ["totalFileSize"] = allFilesSizes }
+			return { ["path"] = flags["/L"] and string.upper( localPath ) or localPath, ["data"] = data, ["numFiles"] = #files - #dirs, ["numDirs"] = #dirs + ( parentData and 1 or 0 ), ["totalFileSize"] = allFilesSizes }
 		end
 		
-		if #active["path"] > 0 then
+		if #flags["path"] > 0 then
 			local ret = " Directory of " .. window:getCurrentDir() .. "/\n"
-			local cd = datapad:ExecuteCommand( "cd " .. active["path"], window )
+			local cd = datapad:ExecuteCommand( "cd " .. flags["path"], window )
 		
 			if cd == "The system cannot find the path specified.\n" then
 				return ret .. "\n" .. cd
@@ -98,12 +98,12 @@ datapad:AddCommand({
 		local parentData = {
 			["date"] = os.date( "%d.%m.%Y.  %H:%M", file.Time( tempPath, "DATA" )  ),
 			["dir"] = file.IsDir( tempPath, "DATA" ),
-			["size"] = active["/C"] and string.Comma( fileSize, "." ) or fileSize,
-			["name"] = active["/L"] and string.upper( tempPath ) or tempPath
+			["size"] = flags["/C"] and string.Comma( fileSize, "." ) or fileSize,
+			["name"] = flags["/L"] and string.upper( tempPath ) or tempPath
 		}
 		
 		table.insert( data, getData( mainPath, not ( window:getTrueCurrentDir() == "personal_files" ) and parentData or {} ) )
-		if active["/S"] then
+		if flags["/S"] then
 			local function goDeep( path, parentData )
 				local _, dirs = file.Find( path ..  "*", "DATA" )
 				
@@ -117,8 +117,8 @@ datapad:AddCommand({
 			goDeep( mainPath, parentData )
 		end
 		
-		if #active["path"] > 0 then
-			local paths = string.Explode( "[/\\]+", active["path"], true )
+		if #flags["path"] > 0 then
+			local paths = string.Explode( "[/\\]+", flags["path"], true )
 			for k, v in ipairs( paths ) do
 				if v == "" then
 					table.remove( paths, k )
@@ -129,11 +129,11 @@ datapad:AddCommand({
 			window:removeText( 2 )
 		end
 		
-		if #active["/O"] > 0 then
+		if #flags["/O"] > 0 then
 			for k, v in ipairs( data ) do
 				table.sort( v["data"], function(a, b)
-					local rev = ( #active["/O"] == 2 and active["/O"][1] == "-" )
-					local sort = ( #active["/O"] == 2 and active["/O"][2] or active["/O"][1] )
+					local rev = ( #flags["/O"] == 2 and flags["/O"][1] == "-" )
+					local sort = ( #flags["/O"] == 2 and flags["/O"][2] or flags["/O"][1] )
 				
 					local comp1 = false
 					local comp2 = false
@@ -160,11 +160,11 @@ datapad:AddCommand({
 		end
 		
 		local toPrint = ""
-		if active["/B"] then
+		if flags["/B"] then
 			for k, v in ipairs( data ) do
 				for i, p in ipairs( v["data"] ) do
 					if not ( p["name"] == ".." ) then
-						toPrint = toPrint .. ( active["/S"] and v["path"] or "" ) .. p["name"] .. "\n"
+						toPrint = toPrint .. ( flags["/S"] and v["path"] or "" ) .. p["name"] .. "\n"
 					end
 				end
 			end
@@ -186,7 +186,7 @@ datapad:AddCommand({
 				toPrint = toPrint .. "\n" .. string.rep( " ", 14 ) .. v["numFiles"] .. " File(s)  " ..  v["totalFileSize"] .. " bytes"
 				toPrint = toPrint .. "\n" .. string.rep( " ", 14 ) .. v["numDirs"] .. " Dir(s)\n\n"
 				
-				if not active["/S"] then continue end
+				if not flags["/S"] then continue end
 			end
 		end
 		
