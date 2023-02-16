@@ -6,3 +6,5 @@ for _, dir in ipairs( directories ) do
 		AddCSLuaFile( "datapad/" .. dir .. "/" .. v )
 	end
 end
+
+util.AddNetworkString( "datapad_open" )

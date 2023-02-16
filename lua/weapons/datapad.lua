@@ -82,7 +82,7 @@ end
 
 function SWEP:PrimaryAttack()
 	if CLIENT then
-		hook.Run( "DatapadTrigger" )
+		datapad:createScreen()
 	end
 end
 
