@@ -283,6 +283,11 @@ function datapad:ExecuteCommand( cmd, window )
 	end
 	cAf[1] = string.lower( cAf[1] )
 	
+	if string.EndsWith( cAf[#cAf], ".lua" ) then
+		cAf[#cAf] = string.StripExtension( cAf[#cAf] )
+		table.insert( cAf, 1, "start" )
+	end
+	
 	if istable( self.cmds[cAf[1]] ) then return self.cmds[cAf[1]]["function"]( cAf, window ) end
 	
 	return "'" .. cAf[1] .. "' is not recognized as a command!\n"

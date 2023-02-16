@@ -6,7 +6,7 @@ function datapad:AddApp( app )
 	--if istable( self.apps[app["name"]] ) then
 		--ErrorNoHalt( "App with the name  '" .. app["name"] .. "'  already exists!" )
 	--else
-		self.apps[app["name"]] = app
+		self.apps[string.lower( app["name"] )] = app
 	--end
 end
 
