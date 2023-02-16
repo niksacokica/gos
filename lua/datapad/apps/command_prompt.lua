@@ -1,6 +1,6 @@
 datapad:AddApp({
 	["name"] = "Command Prompt",
-	["icon"] = "datapad/command_prompt.png",
+	["icon"] = "datapad/app_icons/command_prompt.png",
 	["creator"] = "niksacokica",
 	["window"] = function( window )
 		window:SetPos( ScrW() * 0.3, ScrH() * 0.3 )
@@ -10,6 +10,7 @@ datapad:AddApp({
 		window.title = "Command Prompt"
 		window.curDir = "personal_files"
 		
+		local color_gray = Color( 150, 150, 150 )
 		function window:getCurrentDir()
 			local str, _ = string.gsub( window:getTrueCurrentDir(), "personal_files", LocalPlayer():GetName(), 1 )
 			return str
@@ -47,7 +48,7 @@ datapad:AddApp({
 			surface.DrawText( window.title )
 			
 			surface.SetDrawColor( color_white )
-			surface.SetMaterial( Material( "datapad/command_prompt.png" ) )
+			surface.SetMaterial( Material( "datapad/app_icons/command_prompt.png" ) )
 			surface.DrawTexturedRect( w * 0.01, h * 0.015, w * 0.03, h * 0.05 )
 		end
 		

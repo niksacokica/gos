@@ -1,6 +1,6 @@
 datapad:AddApp({
 	["name"] = "Email",
-	["icon"] = "datapad/email.png",
+	["icon"] = "datapad/app_icons/email.png",
 	["creator"] = "niksacokica",
 	["window"] = function( window )
 		window:SetPos( ScrW() * 0.25, ScrH() * 0.25 )
@@ -9,6 +9,7 @@ datapad:AddApp({
 		window:SetTitle( "" )
 		
 		local back_clr = Color( 50, 50, 50 )
+		local color_gray = Color( 150, 150, 150 )
 		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )

@@ -5,7 +5,7 @@ surface.CreateFont( "NumberFont", {
 
 datapad:AddApp({
 	["name"] = "Calculator",
-	["icon"] = "datapad/calculator.png",
+	["icon"] = "datapad/app_icons/calculator.png",
 	["creator"] = "niksacokica",
 	["window"] = function( window )
 		window:SetPos( ScrW() * 0.3, ScrH() * 0.3 )

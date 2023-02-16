@@ -1,6 +1,6 @@
 datapad:AddApp({
 	["name"] = "File Explorer",
-	["icon"] = "datapad/file_explorer.png",
+	["icon"] = "datapad/app_icons/file_explorer.png",
 	["creator"] = "niksacokica",
 	["window"] = function( window )
 		window:SetPos( ScrW() * 0.3, ScrH() * 0.3 )
@@ -9,6 +9,7 @@ datapad:AddApp({
 		window:SetTitle( "" )
 		
 		local back_clr = Color( 50, 50, 50 )
+		local color_gray = Color( 150, 150, 150 )
 		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
@@ -41,7 +42,9 @@ datapad:AddApp({
 		
 		browser.Refresh = function( self )
 			if not file.Exists( "datapad/personal_files", "DATA" ) then
-				file.CreateDir( "datapad/personal_files" )
+				file.CreateDir( "datapad/personal_files/appdata" )
+				file.CreateDir( "datapad/personal_files/desktop" )
+				file.CreateDir( "datapad/personal_files/documents" )
 			end
 		
 			local lastOpen = self:GetCurrentFolder()
