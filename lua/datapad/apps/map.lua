@@ -39,12 +39,15 @@ datapad:AddApp({
 			for k, v in ipairs( ents.GetAll() ) do
 				if v:IsPlayer() then
 					if v == LocalPlayer() then
-						surface.SetDrawColor( 0, 0, 255, 255 )
+						surface.SetDrawColor( color_white )
+						surface.SetMaterial( Material("datapad/other/mark_player.png") )
 					else
-						surface.SetDrawColor( 0, 255, 0, 255 )
+						surface.SetDrawColor( color_white )
+						surface.SetMaterial( Material("datapad/other/mark_player2.png") )
 					end
 				elseif v:IsNPC() then
-					surface.SetDrawColor( 255, 0, 0, 255 )
+					surface.SetDrawColor( color_white )
+					surface.SetMaterial( Material("datapad/other/mark_npc.png") )
 				else
 					continue
 				end
@@ -58,7 +61,7 @@ datapad:AddApp({
 				local finalY = h * 0.52 + xPos * zPos * ( ScrH() / 1.92)
 				if finalX > w - ScrH() * 0.03 or finalX < ScrH() * 0.03 or finalY > h - ScrH() * 0.03 or finalY < ScrH() * 0.044 then continue end
 				
-				surface.DrawCircleFilled( finalX, finalY, 20000 * zPos, 25 )
+				surface.DrawCircleFilled( finalX, finalY, 50000 * zPos, 25 )
 			end
 		end
 		
