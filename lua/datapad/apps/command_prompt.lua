@@ -11,6 +11,7 @@ datapad:AddApp({
 		window.curDir = "personal_files"
 		
 		local color_gray = Color( 150, 150, 150 )
+		local color_red = Color( 255, 35, 35)
 		function window:getCurrentDir()
 			local str, _ = string.gsub( window:getTrueCurrentDir(), "personal_files", LocalPlayer():GetName(), 1 )
 			return str

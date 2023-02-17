@@ -15,6 +15,7 @@ datapad:AddApp({
 		
 		local background_color = Color( 222, 222, 222, 232 )
 		local color_gray = Color( 150, 150, 150 )
+		local color_red = Color( 255, 35, 35)
 		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
