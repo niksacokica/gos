@@ -46,6 +46,12 @@ datapad:AddCommand({
 				window:appendText( "\n" )
 			end
 			
+			if not file.Exists( "datapad/personal_files/appdata", "DATA" ) or not file.Exists( "datapad/personal_files/desktop", "DATA" ) or not file.Exists( "datapad/personal_files/documents", "DATA" ) then
+				file.CreateDir( "datapad/personal_files/appdata" )
+				file.CreateDir( "datapad/personal_files/desktop" )
+				file.CreateDir( "datapad/personal_files/documents" )
+			end
+			
 			return ""
 		end
 	

@@ -3,9 +3,11 @@ datapad = istable( datapad ) and datapad or {}
 function datapad:AddApp( app )
 	self.apps = istable( self.apps ) and self.apps or {}
 	
+	local hookReturn = hook.Run( "DatapadAddApp", app["name"] )
+	
 	--if istable( self.apps[app["name"]] ) then
 		--ErrorNoHalt( "App with the name  '" .. app["name"] .. "'  already exists!" )
-	--else
+	--elseif not hookReturn then
 		self.apps[string.lower( app["name"] )] = app
 	--end
 end
@@ -19,7 +21,16 @@ for _, dir in ipairs( directories ) do
 	end
 end
 
+if not file.Exists( "datapad/personal_files/appdata", "DATA" ) or not file.Exists( "datapad/personal_files/desktop", "DATA" ) or not file.Exists( "datapad/personal_files/documents", "DATA" ) then
+	file.CreateDir( "datapad/personal_files/appdata" )
+	file.CreateDir( "datapad/personal_files/desktop" )
+	file.CreateDir( "datapad/personal_files/documents" )
+end
+
 function datapad:StartApp( v )
+	local hookReturn = hook.Run( "DatapadPreAppStart", v )
+	if hookReturn then return end
+
 	local window = vgui.Create( "DFrame" )
 	window:Center()
 	window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
@@ -46,10 +57,15 @@ function datapad:StartApp( v )
 	table.insert( self.screen.OpenApps, { window, v["name"] } )
 	v["window"]( window )
 	
+	hook.Run( "DatapadPostAppStart", v )
+	
 	return window
 end
 
-local function populateApps( grid )	
+local function populateApps( grid )
+	local hookReturn = hook.Run( "DatapadPreAppPopulate", datapad.apps )
+	if hookReturn then return end
+
 	for k, v in SortedPairs( datapad.apps ) do
 		local app = vgui.Create( "DButton" )
 		app:SetText( "" )
@@ -69,10 +85,15 @@ local function populateApps( grid )
 			grid:AddItem( app )
 		end
 	end
+	
+	hook.Run( "DatapadPostAppPopulate", datapad.apps )
 end
 
 local background_clr = Color(126, 185, 181)
 function datapad:createScreen()
+	local hookReturn = hook.Run( "DatapadPreScreenCreate" )
+	if hookReturn then return end
+
 	if not isstring( self.shutdownTimer ) then self.shutdownTimer = "DatapadShutdown" .. LocalPlayer():EntIndex() end
 	
 	local background = vgui.Create( "DFrame" )
@@ -100,6 +121,8 @@ function datapad:createScreen()
 	grid:SetCols( 10 )
 	grid:SetColWide( ( ScrW() / 10 ) - 5 )
 	grid:SetRowHeight( ScrW() / 9.1 - 5 )	
+	
+	hook.Run( "DatapadPostScreenCreate" )
 	
 	populateApps( grid )
 end

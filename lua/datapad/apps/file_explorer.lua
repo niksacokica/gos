@@ -42,7 +42,7 @@ datapad:AddApp({
 		browser:SetSize( ScrW() * 0.3495, ScrH() * 0.3205 )
 		
 		browser.Refresh = function( self )
-			if not file.Exists( "datapad/personal_files", "DATA" ) then
+			if not file.Exists( "datapad/personal_files/appdata", "DATA" ) or not file.Exists( "datapad/personal_files/desktop", "DATA" ) or not file.Exists( "datapad/personal_files/documents", "DATA" ) then
 				file.CreateDir( "datapad/personal_files/appdata" )
 				file.CreateDir( "datapad/personal_files/desktop" )
 				file.CreateDir( "datapad/personal_files/documents" )
