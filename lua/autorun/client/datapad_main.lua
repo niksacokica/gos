@@ -21,9 +21,13 @@ for _, dir in ipairs( directories ) do
 	end
 end
 
-if not file.Exists( "datapad/personal_files/appdata", "DATA" ) or not file.Exists( "datapad/personal_files/desktop", "DATA" ) or not file.Exists( "datapad/personal_files/documents", "DATA" ) then
+if not file.Exists( "datapad/personal_files/appdata", "DATA" ) then
 	file.CreateDir( "datapad/personal_files/appdata" )
+end
+if not file.Exists( "datapad/personal_files/desktop", "DATA" ) then
 	file.CreateDir( "datapad/personal_files/desktop" )
+end
+if not file.Exists( "datapad/personal_files/documents", "DATA" ) then
 	file.CreateDir( "datapad/personal_files/documents" )
 end
 
@@ -69,7 +73,7 @@ local function populateApps( grid )
 	for k, v in SortedPairs( datapad.apps ) do
 		local app = vgui.Create( "DButton" )
 		app:SetText( "" )
-		app:SetSize( grid:GetColWide() - 50, grid:GetRowHeight() - 50 )
+		app:SetSize( grid:GetColWide()*0.8, grid:GetRowHeight()*0.8 )
 		app.DoDoubleClick = function()
 			datapad:StartApp( v )
 		end
@@ -89,6 +93,66 @@ local function populateApps( grid )
 	hook.Run( "DatapadPostAppPopulate", datapad.apps )
 end
 
+local function taskBar( background )
+	local hookReturn = hook.Run( "DatapadPreTaskBar" )
+	if hookReturn then return end
+	
+	local bar = vgui.Create( "DPanel", background )
+	bar:SetPos( 0, 0 )
+	bar:SetSize( ScrW(), ScrH()*0.025 )
+	bar:SetPaintBackground( true )
+	bar:MakePopup()
+	
+	local icon = vgui.Create( "DButton", bar )
+	icon:SetText( "" )
+	icon:SetPos( ScrW()*0.002, ScrH()*0.003 )
+	icon:SetSize( ScrH()*0.02, ScrH()*0.02 )
+	icon.DoClick = function()
+		background:Remove()
+	end
+	
+	local iconMat = Material( "icon16/stop.png" )
+	icon.Paint = function( self, w, h )
+		draw.NoTexture()
+	
+		surface.SetMaterial( iconMat )
+		surface.SetDrawColor( 255, 255, 255, 255 )
+		surface.DrawTexturedRect( 0, 0, w, h )
+	end
+	
+	local dateTime = vgui.Create( "DLabel", bar )
+	dateTime:SetText( "" )
+	dateTime:SetPos( ScrW() * 0.97, ScrH()*0.003 )
+	dateTime:SetSize( ScrW() * 0.025, ScrH()*0.02 )
+	
+	dateTime.Paint = function( self, w, h )
+		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "DermaDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
+		
+		return true
+	end
+	
+	local ping = vgui.Create( "DLabel", bar )
+	ping:SetText( "" )
+	ping:SetPos( ScrW() * 0.94, 0 )
+	ping:SetSize( ScrW() * 0.025, ScrH()*0.044 )
+	
+	local wifiMat = Material( "icon16/bullet_feed.png" )
+	ping.Paint = function( self, w, h )
+		local p = LocalPlayer():Ping()
+		local c = Color( math.min( 255, p ), math.max( 0, 255 - p ), 0, 255 )
+		draw.DrawText( p, "GModNotify", w*0.7, h*0.1, c, TEXT_ALIGN_CENTER )
+		
+		draw.NoTexture()
+	
+		surface.SetMaterial( wifiMat )
+		surface.SetDrawColor( c:Unpack() )
+		surface.DrawTexturedRect( 0, 0, w*0.6, h*0.6 )
+		return true
+	end
+
+	hook.Run( "DatapadPostTaskBar" )
+end
+
 local background_clr = Color(126, 185, 181)
 function datapad:createScreen()
 	local hookReturn = hook.Run( "DatapadPreScreenCreate" )
@@ -103,6 +167,7 @@ function datapad:createScreen()
 	background:SetDraggable( false )
 	background:MakePopup()
 	background:SetPopupStayAtBack( true )
+	background:ShowCloseButton( false )
 	
 	background.OpenApps = {}
 	self.screen = background
@@ -117,13 +182,14 @@ function datapad:createScreen()
 	end
 	
 	local grid = vgui.Create( "DGrid", background )
-	grid:SetPos( 50, 50 )
+	grid:SetPos( ScrW()*0.01 , ScrH()*0.05 )
 	grid:SetCols( 10 )
-	grid:SetColWide( ( ScrW() / 10 ) - 5 )
-	grid:SetRowHeight( ScrW() / 9.1 - 5 )	
+	grid:SetColWide( ScrW() * 0.099 )
+	grid:SetRowHeight( ScrH() * 0.193 )	
 	
 	hook.Run( "DatapadPostScreenCreate" )
 	
+	taskBar( background )
 	populateApps( grid )
 end
 

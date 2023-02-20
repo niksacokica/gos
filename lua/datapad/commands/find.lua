@@ -64,7 +64,7 @@ datapad:AddCommand({
 			toPrint = toPrint .. ": " .. #result .. "\n"
 		else
 			toPrint = toPrint .. "\n"
-			for k, v in pairs( result ) do
+			for k, v in SortedPairs( result ) do
 				toPrint = toPrint .. ( flags["/N"] and "[" .. k .. "]" or "" ) .. v
 			end
 		end
