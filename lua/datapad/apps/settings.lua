@@ -36,8 +36,30 @@ datapad:AddApp({
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
 		end
+		
+		local cats = vgui.Create( "DScrollPanel", window )
+		cats:SetPos( ScrW() * 0.01, ScrH() * 0.03 )
+		cats:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
+		for k, v in SortedPairsByMemberValue( datapad.options, "category" ) do
+			local cat = cats:Add( "DButton" )
+			cat:SetText( k )
+			cat:Dock( TOP )
+			cat:DockMargin( 0, 0, 0, 5 )
+		end
 	end
 })
 
 function datapad:AddOption( option )
+	self.options = istable( self.options ) and self.options or {}
+	self.oCategories = istable( self.oCategories ) and self.oCategories or {}
+	
+	local on = string.lower( option["option"] )
+	local oc = string.lower( option["category"] )
+	--if istable( self.options[on] ) then
+		--ErrorNoHalt( "Option with the name '" .. on .. "' already exists!" )
+	--else
+		self.options[on] = option
+	--end
+	
+	self.oCategories[oc] = true
 end
