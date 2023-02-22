@@ -13,6 +13,9 @@ datapad:AddApp({
 		local back_clr = Color( 50, 50, 50 )
 		local color_gray = Color( 150, 150, 150 )
 		local color_red = Color( 255, 35, 35)
+		local localPlyMat = Material("datapad/other/mark_player.png")
+		local plyMat = Material("datapad/other/mark_player2.png"
+		local npcMat = Material("datapad/other/mark_npc.png")
 		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
@@ -41,16 +44,20 @@ datapad:AddApp({
 				if v:IsPlayer() then
 					if v == LocalPlayer() then
 						surface.SetDrawColor( color_white )
-						surface.SetMaterial( Material("datapad/other/mark_player.png") )
+						surface.SetMaterial( localPlyMat )
 					else
 						surface.SetDrawColor( color_white )
-						surface.SetMaterial( Material("datapad/other/mark_player2.png") )
+						surface.SetMaterial( plyMat )
 					end
 				elseif v:IsNPC() then
 					surface.SetDrawColor( color_white )
-					surface.SetMaterial( Material("datapad/other/mark_npc.png") )
+					surface.SetMaterial( npcMat )
 				else
 					continue
+				end
+				
+				if not v:GetNoDraw() and not ( v == LocalPlayer() ) then
+					v:SetNoDraw( true )
 				end
 				
 				local pos = v:GetPos()
@@ -62,7 +69,16 @@ datapad:AddApp({
 				local finalY = h * 0.52 + xPos * zPos * ( ScrH() / 1.92)
 				if finalX > w - ScrH() * 0.03 or finalX < ScrH() * 0.03 or finalY > h - ScrH() * 0.03 or finalY < ScrH() * 0.044 then continue end
 				
-				surface.DrawCircleFilled( finalX, finalY, 50000 * zPos, 25 )
+				local dims = 50000 * zPos
+				surface.DrawTexturedRect( finalX, finalY, dims, dims )
+			end
+		end
+		
+		window.OnDelete = function( self )
+			for k, v in ipairs( ents.GetAll() ) do
+				if ( v:IsPlayer() or v:IsNPC() ) and v:GetNoDraw() and not ( v == LocalPlayer() ) then
+					v:SetNoDraw( false )
+				end
 			end
 		end
 		

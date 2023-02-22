@@ -58,6 +58,9 @@ function datapad:StartApp( v )
 		handleWindowClose()
 	end
 	
+	function window:OnDelete()
+	end
+	
 	table.insert( self.screen.OpenApps, { window, v["name"] } )
 	v["window"]( window )
 	
