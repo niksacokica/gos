@@ -3,13 +3,15 @@ datapad = istable( datapad ) and datapad or {}
 function datapad:AddApp( app )
 	self.apps = istable( self.apps ) and self.apps or {}
 	
-	local hookReturn = hook.Run( "DatapadAddApp", app["name"] )
+	local hookReturn = hook.Run( "DatapadAddApp", app )
 	
-	--if istable( self.apps[app["name"]] ) then
+	if #app["name"] == 0 then
+		return
+	--elseif istable( self.apps[app["name"]] ) then
 		--ErrorNoHalt( "App with the name  '" .. app["name"] .. "'  already exists!" )
-	--elseif not hookReturn then
+	elseif not hookReturn then
 		self.apps[string.lower( app["name"] )] = app
-	--end
+	end
 end
 
 local files, directories = file.Find( "datapad/*", "LUA" )
@@ -58,6 +60,9 @@ function datapad:StartApp( v )
 	end
 	function window:OnRemove()
 		handleWindowClose()
+	end
+	
+	function window:OnDelete()
 	end
 	
 	table.insert( self.screen.OpenApps, { window, v["name"] } )

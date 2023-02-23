@@ -1,5 +1,5 @@
 datapad:AddApp({
-	["name"] = "Email",
+	["name"] = "Settings",
 	["icon"] = "datapad/app_icons/settings.png",
 	["creator"] = "niksacokica",
 	["window"] = function( window )
@@ -39,27 +39,55 @@ datapad:AddApp({
 		
 		local cats = vgui.Create( "DScrollPanel", window )
 		cats:SetPos( ScrW() * 0.01, ScrH() * 0.03 )
-		cats:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
-		for k, v in SortedPairsByMemberValue( datapad.options, "category" ) do
+		cats:SetSize( ScrW() * 0.1, ScrH() * 0.454 )
+		
+		local sbar = cats:GetVBar()
+		function sbar.btnUp:Paint( w, h )
+		end
+		function sbar.btnDown:Paint( w, h )
+		end
+		function sbar.btnGrip:Paint( w, h )
+			draw.RoundedBox( 10, 0, 0, w, h, color_black )
+		end
+		
+		local color_darkGray = Color( 25, 25, 25 )
+		function sbar:Paint( w, h )
+			draw.RoundedBox( 5, w * 0.4, h * 0.01, w * 0.2, h * 0.98, color_darkGray )
+		end
+		
+		PrintTable(datapad.settings)
+		for i=0, 100 do
+		for k, v in SortedPairsByMemberValue( datapad.settings, "category" ) do
 			local cat = cats:Add( "DButton" )
-			cat:SetText( k )
+			cat:SetText( "" )
 			cat:Dock( TOP )
 			cat:DockMargin( 0, 0, 0, 5 )
+			cat:SetSize( ScrW() * 0.1, ScrH() * 0.033 )
+			
+			k = string.SetChar( k, 1, string.upper( k[1] ) )
+			cat.Paint = function( self, w, h )				
+				draw.NoTexture()
+				draw.DrawText( k, "DermaLarge", w * 0.5, h * 0.2, color_black, TEXT_ALIGN_CENTER )
+			end
+		end
 		end
 	end
 })
 
-function datapad:AddOption( option )
-	self.options = istable( self.options ) and self.options or {}
-	self.oCategories = istable( self.oCategories ) and self.oCategories or {}
+function datapad:AddSetting( setting )
+	self.settings = istable( self.settings ) and self.settings or {}
 	
-	local on = string.lower( option["option"] )
-	local oc = string.lower( option["category"] )
-	--if istable( self.options[on] ) then
-		--ErrorNoHalt( "Option with the name '" .. on .. "' already exists!" )
+	local sn = string.lower( setting["setting"] )
+	local sc = string.lower( setting["category"] )
+	local ssc = string.lower( setting["subCategory"] )
+	
+	if #sn == 0 or #sc == 0 or #ssc == 0 then return end
+	
+	--if istable( self.settings[sc][ssc][sn] ) then
+		--ErrorNoHalt( "Setting with the name '" .. sn .. "' already exists for the path '" .. sc .. "/" .. ssc .. "'!" )
 	--else
-		self.options[on] = option
+		self.settings[sc] = istable( self.settings[sc] ) and self.settings[sc] or {}
+		self.settings[sc][ssc] = istable( self.settings[sc][ssc] ) and self.settings[sc][ssc] or {}
+		self.settings[sc][ssc][sn] = setting
 	--end
-	
-	self.oCategories[oc] = true
 end

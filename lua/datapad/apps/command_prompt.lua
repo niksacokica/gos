@@ -265,14 +265,15 @@ function datapad:AddCommand( cmd )
 	self.cmds = istable( self.cmds ) and self.cmds or {}
 	
 	local cl = string.lower( cmd["cmd"] )
-	
-	--if istable( self.cmds[cl] ) then
+	if #cmd["cmd"] == 0 then
+		return
+	--elseif istable( self.cmds[cl] ) then
 		--ErrorNoHalt( "Command with the name '" .. cl .. "' already exists!" )
 	--elseif #cl > 14 then
 		--ErrorNoHalt( "Command name '" .. cl .. "' is too long, max length is 14 characters!" )
-	--else
+	else
 		self.cmds[cl] = cmd
-	--end
+	end
 end
 
 function datapad:ExecuteCommand( cmd, window )
