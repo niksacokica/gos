@@ -41,35 +41,122 @@ datapad:AddApp({
 		cats:SetPos( ScrW() * 0.01, ScrH() * 0.03 )
 		cats:SetSize( ScrW() * 0.1, ScrH() * 0.454 )
 		
-		local sbar = cats:GetVBar()
-		function sbar.btnUp:Paint( w, h )
+		local cSbar = cats:GetVBar()
+		function cSbar.btnUp:Paint( w, h )
 		end
-		function sbar.btnDown:Paint( w, h )
+		function cSbar.btnDown:Paint( w, h )
 		end
-		function sbar.btnGrip:Paint( w, h )
+		function cSbar.btnGrip:Paint( w, h )
 			draw.RoundedBox( 10, 0, 0, w, h, color_black )
 		end
 		
 		local color_darkGray = Color( 25, 25, 25 )
-		function sbar:Paint( w, h )
+		function cSbar:Paint( w, h )
 			draw.RoundedBox( 5, w * 0.4, h * 0.01, w * 0.2, h * 0.98, color_darkGray )
 		end
 		
-		PrintTable(datapad.settings)
-		for i=0, 100 do
-		for k, v in SortedPairsByMemberValue( datapad.settings, "category" ) do
+		local sCats = vgui.Create( "DScrollPanel", window )
+		sCats:SetPos( ScrW() * 0.15, ScrH() * 0.03 )
+		sCats:SetSize( ScrW() * 0.342, ScrH() * 0.454 )
+		
+		local scSbar = sCats:GetVBar()
+		function scSbar.btnUp:Paint( w, h )
+		end
+		function scSbar.btnDown:Paint( w, h )
+		end
+		function scSbar.btnGrip:Paint( w, h )
+			draw.RoundedBox( 10, 0, 0, w, h, color_black )
+		end
+		
+		local color_darkGray = Color( 25, 25, 25 )
+		function scSbar:Paint( w, h )
+			draw.RoundedBox( 5, w * 0.4, h * 0.01, w * 0.2, h * 0.98, color_darkGray )
+		end
+		
+		local first = true
+		for cn, c in SortedPairs( datapad.settings ) do
 			local cat = cats:Add( "DButton" )
 			cat:SetText( "" )
 			cat:Dock( TOP )
 			cat:DockMargin( 0, 0, 0, 5 )
 			cat:SetSize( ScrW() * 0.1, ScrH() * 0.033 )
 			
-			k = string.SetChar( k, 1, string.upper( k[1] ) )
+			cn = string.upper( cn )
 			cat.Paint = function( self, w, h )				
 				draw.NoTexture()
-				draw.DrawText( k, "DermaLarge", w * 0.5, h * 0.2, color_black, TEXT_ALIGN_CENTER )
+				draw.DrawText( cn, "DermaLarge", w * 0.5, h * 0.2, color_black, TEXT_ALIGN_CENTER )
 			end
-		end
+			
+			cat.DoClick = function()
+				sCats:Clear()
+			
+				for scn, sc in SortedPairs( c ) do
+					local sCat = sCats:Add( "DLabel" )
+					sCat:SetText( "" )
+					sCat:Dock( TOP )
+					sCat:DockMargin( 0, 50, 0, 0 )
+					sCat:SetHeight( ScrH() * 0.03 )
+					
+					scn = string.upper( scn )
+					sCat.Paint = function( self, w, h )				
+						draw.NoTexture()
+						draw.DrawText( scn, "DermaLarge", 0, h * 0.1, color_white )
+						
+						surface.SetDrawColor( color_white )
+						surface.DrawLine( 0, h * 0.9, w * 0.99, h * 0.9 )
+					end
+					
+					for sn, s in SortedPairs( sc ) do
+						local sHeight, sWidth, sPan = s["function"]()
+					
+						local sBack = sCats:Add( "DPanel" )
+						sBack:Dock( TOP )
+						sBack:DockMargin( 0, 10, 0, 0 )
+						sBack:SetHeight( ScrH() * sHeight )
+						sBack.Paint = function( self, w, h )
+						end
+						
+						local sLeft = vgui.Create( "DPanel", sBack )
+						sLeft:Dock( LEFT )
+						sLeft:SetWidth( ScrW() * sWidth )
+						sLeft.Paint = function( self, w, h )
+						end
+						
+						local sRight = vgui.Create( "DPanel", sBack )
+						sRight:Dock( RIGHT )
+						sRight:DockMargin( 0, 0, 5, 0 )
+						sRight.Paint = function( self, w, h )
+						end
+						
+						--sPan:SetParent( sRight )
+						
+						local sTitle = vgui.Create( "DLabel", sLeft )
+						sTitle:SetText( s["title"] )
+						sTitle:SetWrap( true )
+						sTitle:Dock( TOP )
+						sTitle.Paint = function( self, w, h )
+						end
+						
+						local sDesc = vgui.Create( "DLabel", sLeft )
+						sDesc:SetText( s["description"] )
+						sDesc:SetWrap( true )
+						sDesc:Dock( TOP )
+						sDesc:DockMargin( 5, 0, 0, 0 )
+						sDesc.Paint = function( self, w, h )
+						end
+						
+						local sCat2 = vgui.Create( "DLabel", sRight )
+						sCat2:SetText( sn )
+						sCat2:Dock( TOP )
+					end
+				end
+			end
+			
+			if first then
+				cat:DoClick()
+			
+				first = false
+			end
 		end
 	end
 })

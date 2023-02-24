@@ -5,7 +5,7 @@ datapad:AddSetting({
 	["description"] = "Adjust the zoom sensitivity.",
 	["category"] = "minimap",
 	["subCategory"] = "sensitivity",
-	["function"] = function( args, window )
-		return
+	["function"] = function()
+		return 0.03, 0.06
 	end
 })

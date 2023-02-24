@@ -6,6 +6,6 @@ datapad:AddSetting({
 	["category"] = "minimap",
 	["subCategory"] = "drawing",
 	["function"] = function( args, window )
-		return
+		return 0.03, 0.09
 	end
 })

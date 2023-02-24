@@ -83,7 +83,7 @@ datapad:AddApp({
 			local warningText = vgui.Create( "DLabel", warning )
 			warningText:SetPos( ScrW() * 0.005, ScrH() * 0.022 )
 			warningText:SetSize( ScrW() * 0.09, ScrH() * 0.04 )
-			warningText:SetWrap(true)
+			warningText:SetWrap( true )
 			warningText:SetText( text )
 			
 			local okWarning = vgui.Create( "DButton", warning )
@@ -229,7 +229,7 @@ datapad:AddApp({
 			local delText = vgui.Create( "DLabel", popUp )
 			delText:SetPos( ScrW() * 0.005, ScrH() * 0.022 )
 			delText:SetSize( ScrW() * 0.09, ScrH() * 0.04 )
-			delText:SetWrap(true)
+			delText:SetWrap( true )
 			delText:SetText( "Are you sure you want to delete \"" .. curPath .. "\" and all of its contents?" )
 			
 			local cancel = vgui.Create( "DButton", popUp )

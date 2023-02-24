@@ -44,7 +44,9 @@ function datapad:StartApp( v )
 	window:MakePopup()
 	
 	function handleWindowClose()
-		window:OnDelete()
+		if window.OnDelete then
+			window:OnDelete()
+		end
 	
 		for key, val in ipairs( self.screen.OpenApps ) do
 			if val[2] == v["name"] and val[1] == window then
@@ -60,9 +62,6 @@ function datapad:StartApp( v )
 	end
 	function window:OnRemove()
 		handleWindowClose()
-	end
-	
-	function window:OnDelete()
 	end
 	
 	table.insert( self.screen.OpenApps, { window, v["name"] } )
