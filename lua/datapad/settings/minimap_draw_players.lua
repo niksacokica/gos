@@ -36,7 +36,7 @@ datapad:AddSetting({
 			draw.RoundedBox( 50, ScrW() * 0.002, ScrH() * 0.003, ScrW() * 0.036, ScrH() * 0.034, toggle:GetChecked() and color_green or color_red )
 			
 			draw.NoTexture()
-			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetDrawColor( color_white:Unpack() )
 			drawCircle( ScrW() * togPos, ScrH() * 0.02, ScrH() * 0.017, 25 )
 			
 			if not clicked then return end

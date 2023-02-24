@@ -147,6 +147,65 @@ datapad:AddApp({
 			end
 		end
 		
+		local function doLineTraceUD( up )
+			local tr = util.TraceLine( {
+				start = camPos,
+				endpos = Vector( camPos.x, camPos.y, camPos.z + ( up and 100000 or -100000 ) ),
+				filter = function( ent ) return not ( ent:IsPlayer() or ent:IsNPC() ) end
+			} )
+			
+			return tr
+		end
+		
+		local zoomMod = datapad:GetSetting( "mm_zoom_sens", 1 )
+		window.OnMouseWheeled = function( self, data )
+			if not camPos then return end
+		
+			local mod = ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000
+		
+			if data > 0 and mod > 0.5 then
+				camPos.z = camPos.z - 100 * mod * zoomMod
+			elseif data < 0 and ( doLineTraceUD( true )["HitPos"].z - camPos.z ) / 1000 > 1 then
+				camPos.z = camPos.z + 100 * mod * zoomMod
+			end
+		end
+		
+		local lastPress = nil
+		local panMod = datapad:GetSetting( "mm_pan_sens", 1 )
+		window.OnCursorMoved = function( self, x, y )
+			if input.IsMouseDown( MOUSE_LEFT ) and camPos then
+				if lastPress then
+					local mod = ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000
+					
+					local tempPos = Vector( camPos )
+					
+					camPos:Rotate( Angle( 0, camAng.r, 0 ) )
+					camPos.x = camPos.x - ( lastPress.y - y ) * mod * panMod
+					camPos.y = camPos.y - ( lastPress.x - x ) * mod * panMod
+					camPos:Rotate( Angle( 0, -camAng.r, 0 ) )
+					
+					if doHullTrace( camPos ) then camPos = tempPos end
+				end
+				
+				lastPress = Vector(x, y, 0)
+			elseif lastPress then
+				lastPress = nil
+			end
+		end
+		
+		local rotMod = datapad:GetSetting( "mm_rot_sens", 1 )
+		window.Think = function( self )
+			if input.IsKeyDown( KEY_Q ) then
+				camAng.r = camAng.r + 0.5 * rotMod
+				
+				camAng:Normalize()
+			elseif input.IsKeyDown( KEY_E ) then
+				camAng.r = camAng.r - 0.5 * rotMod
+				
+				camAng:Normalize()
+			end
+		end
+		
 		hook.Add( "DatapadSettingsNewValue", "MinimapSettingsChanged", function( setting, newValue )
 			if setting == "mm_draw_npc" then
 				drawNpcs = newValue
@@ -178,64 +237,14 @@ datapad:AddApp({
 						end
 					end
 				end
+			elseif setting == "mm_pan_sens" then
+				panMod = newValue
+			elseif setting == "mm_rot_sens" then
+				rotMod = newValue
+			elseif setting == "mm_zoom_sens" then
+				zoomMod = newValue
 			end
 		end	)
-		
-		local function doLineTraceUD( up )
-			local tr = util.TraceLine( {
-				start = camPos,
-				endpos = Vector( camPos.x, camPos.y, camPos.z + ( up and 100000 or -100000 ) ),
-				filter = function( ent ) return not ( ent:IsPlayer() or ent:IsNPC() ) end
-			} )
-			
-			return tr
-		end
-		
-		window.OnMouseWheeled = function( self, data )
-			if not camPos then return end
-		
-			local mod = ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000
-		
-			if data > 0 and mod > 0.5 then
-				camPos.z = camPos.z - 100 * mod
-			elseif data < 0 and ( doLineTraceUD( true )["HitPos"].z - camPos.z ) / 1000 > 1 then
-				camPos.z = camPos.z + 100 * mod
-			end
-		end
-		
-		local lastPress = nil
-		window.OnCursorMoved = function( self, x, y )
-			if input.IsMouseDown( MOUSE_LEFT ) and camPos then
-				if lastPress then
-					local mod = ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000
-					
-					local tempPos = Vector( camPos )
-					
-					camPos:Rotate( Angle( 0, camAng.r, 0 ) )
-					camPos.x = camPos.x - ( lastPress.y - y ) * mod
-					camPos.y = camPos.y - ( lastPress.x - x ) * mod
-					camPos:Rotate( Angle( 0, -camAng.r, 0 ) )
-					
-					if doHullTrace( camPos ) then camPos = tempPos end
-				end
-				
-				lastPress = Vector(x, y, 0)
-			elseif lastPress then
-				lastPress = nil
-			end
-		end
-		
-		window.Think = function( self )
-			if input.IsKeyDown( KEY_Q ) then
-				camAng.r = camAng.r + 0.5
-				
-				camAng:Normalize()
-			elseif input.IsKeyDown( KEY_E ) then
-				camAng.r = camAng.r - 0.5
-				
-				camAng:Normalize()
-			end
-		end
 		
 		local cls = vgui.Create( "DButton", window )
 		cls:SetText( "" )
