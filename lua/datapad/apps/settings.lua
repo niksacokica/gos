@@ -100,10 +100,10 @@ datapad:AddApp({
 					scn = string.upper( scn )
 					sCat.Paint = function( self, w, h )				
 						draw.NoTexture()
-						draw.DrawText( scn, "DermaLarge", 0, h * 0.1, color_white )
+						draw.DrawText( scn, "DermaLarge", 0, h * 0.09, color_white )
 						
 						surface.SetDrawColor( color_white )
-						surface.DrawLine( 0, h * 0.9, w * 0.99, h * 0.9 )
+						surface.DrawLine( 0, h * 0.98, w * 0.99, h * 0.98 )
 					end
 					
 					for sn, s in SortedPairs( sc ) do
@@ -128,26 +128,24 @@ datapad:AddApp({
 						sRight.Paint = function( self, w, h )
 						end
 						
-						--sPan:SetParent( sRight )
+						if sPan then
+							sPan:SetParent( sRight )
+							sRight:SetWidth( ScrW() * 0.001 + sPan:GetWide() )
+						end
 						
 						local sTitle = vgui.Create( "DLabel", sLeft )
 						sTitle:SetText( s["title"] )
+						sTitle:SetFont( "Trebuchet24" )
+						sTitle:SetHeight( ScrH() * 0.03 )
 						sTitle:SetWrap( true )
 						sTitle:Dock( TOP )
-						sTitle.Paint = function( self, w, h )
-						end
 						
 						local sDesc = vgui.Create( "DLabel", sLeft )
 						sDesc:SetText( s["description"] )
 						sDesc:SetWrap( true )
+						sDesc:SetHeight( sLeft:GetTall() )
 						sDesc:Dock( TOP )
 						sDesc:DockMargin( 5, 0, 0, 0 )
-						sDesc.Paint = function( self, w, h )
-						end
-						
-						local sCat2 = vgui.Create( "DLabel", sRight )
-						sCat2:SetText( sn )
-						sCat2:Dock( TOP )
 					end
 				end
 			end
@@ -177,4 +175,28 @@ function datapad:AddSetting( setting )
 		self.settings[sc][ssc] = istable( self.settings[sc][ssc] ) and self.settings[sc][ssc] or {}
 		self.settings[sc][ssc][sn] = setting
 	--end
+end
+
+function datapad:GetSetting( setting, defaultReturn )
+	self.settingsValues = istable( self.settingsValues ) and self.settingsValues or {}
+
+	if not file.Exists( "datapad/personal_files/appdata/settings.json", "DATA" ) then
+		self.settingsValues = {}
+		file.Write( "datapad/personal_files/appdata/settings.json", util.TableToJSON( self.settingsValues, true ) )
+		
+		return defaultReturn
+	elseif not istable( self.settingsValues ) then
+		self.settingsValues = util.JSONToTable( file.Read( "datapad/personal_files/appdata/settings.json", "DATA" ) )
+	end
+	
+	return ( self.settingsValues[setting] == nil and defaultReturn or self.settingsValues[setting] )
+end
+
+function datapad:SaveSetting( setting, newValue )
+	self.settingsValues = istable( self.settingsValues ) and self.settingsValues or {}
+	self.settingsValues[setting] = newValue
+	
+	file.Write( "datapad/personal_files/appdata/settings.json", util.TableToJSON( self.settingsValues, true ) )
+	
+	hook.Run( "DatapadSettingsNewValue", setting, newValue )
 end

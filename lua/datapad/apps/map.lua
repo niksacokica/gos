@@ -43,6 +43,8 @@ datapad:AddApp({
 		local localPlyMat = Material( "datapad/other/mark_player.png" )
 		local plyMat = Material( "datapad/other/mark_player2.png" )
 		local npcMat = Material( "datapad/other/mark_npc.png" )
+		local drawNpcs = datapad:GetSetting( "mm_draw_npc", false )
+		local drawPlys = datapad:GetSetting( "mm_draw_ply", false )
 		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
@@ -87,7 +89,7 @@ datapad:AddApp({
 						surface.SetDrawColor( color_white )
 						surface.SetMaterial( plyMat )
 						
-						if not v:GetNoDraw() then
+						if not v:GetNoDraw() and not drawPlys then
 							v:SetNoDraw( true )
 							
 							local weapon = v:GetActiveWeapon()
@@ -100,7 +102,7 @@ datapad:AddApp({
 					surface.SetDrawColor( color_white )
 					surface.SetMaterial( npcMat )
 					
-					if not v:GetNoDraw() then
+					if not v:GetNoDraw() and not drawNpcs then
 						v:SetNoDraw( true )
 						
 						local weapon = v:GetActiveWeapon()
@@ -144,6 +146,40 @@ datapad:AddApp({
 				end
 			end
 		end
+		
+		hook.Add( "DatapadSettingsNewValue", "MinimapSettingsChanged", function( setting, newValue )
+			if setting == "mm_draw_npc" then
+				drawNpcs = newValue
+				
+				if newValue then
+					for k, v in ipairs( ents.GetAll() ) do
+						if v:IsNPC() and v:GetNoDraw() then
+							v:SetNoDraw( false )
+							
+							local weapon = v:GetActiveWeapon()
+							if IsValid( weapon ) then
+								weapon:SetNoDraw( false )
+							end
+						end
+					end
+				end
+			elseif setting == "mm_draw_ply" then
+				drawPlys = newValue
+				
+				if newValue then
+					for k, v in ipairs( ents.GetAll() ) do
+						if v:IsPlayer() and v:GetNoDraw() and not ( v == LocalPlayer() ) then
+							v:SetNoDraw( false )
+							
+							local weapon = v:GetActiveWeapon()
+							if IsValid( weapon ) then
+								weapon:SetNoDraw( false )
+							end
+						end
+					end
+				end
+			end
+		end	)
 		
 		local function doLineTraceUD( up )
 			local tr = util.TraceLine( {
