@@ -35,21 +35,23 @@ function datapad:StartApp( v )
 	window:SetParent( self.screen )
 	window:MakePopup()
 	
-	function handleWindowClose()
+	local ind = #self.OpenApps
+	local function handleWindowClose()
 		if window.OnDelete then
 			window:OnDelete()
 		end
-	
+		
 		for key, val in ipairs( self.OpenApps ) do
 			if val[2] == v["name"] and val[1] == window then
 				table.remove( self.OpenApps, key )
 				
+				hook.Run( "DatapadAppClosed" )
 				return
 			end
 		end
 	end
 	
-	function window:OnClose()
+	function window:OnClose()	
 		handleWindowClose()
 	end
 	function window:OnRemove()
@@ -60,8 +62,6 @@ function datapad:StartApp( v )
 	v["window"]( window )
 	
 	hook.Run( "DatapadPostAppStart", v )
-	
-	return window
 end
 
 local function populateApps( grid )
@@ -100,6 +100,7 @@ local function taskBar( background )
 	bar:SetSize( ScrW(), 33 )
 	bar:SetPaintBackground( true )
 	bar:MakePopup()
+	bar:SetPopupStayAtBack( true )
 	
 	local icon = vgui.Create( "DButton", bar )
 	icon:SetText( "" )
@@ -120,24 +121,26 @@ local function taskBar( background )
 	
 	local openApps = vgui.Create( "DGrid", bar )
 	openApps:SetPos( 40, 3 )
-	hook.Add( "DatapadPostAppStart", "DatapadAddAppToTaskBar", function( app )
-		openApps:Clear()
-		openApps.Items = {}
+	datapad.TaskBar = openApps
+	
+	local function fillTaskBar()
+		if not IsValid( datapad.TaskBar ) then return end
+		datapad.TaskBar:Clear()
+		datapad.TaskBar.Items = {}
 		
 		local numMath = ( 1 / #datapad.OpenApps ) * ScrW()
-		openApps:SetCols( #datapad.OpenApps )
-		openApps:SetColWide( math.min( numMath * 0.937, ScrW() * 0.075 ) )
+		datapad.TaskBar:SetCols( #datapad.OpenApps )
+		datapad.TaskBar:SetColWide( math.min( numMath * 0.937, ScrW() * 0.075 ) )
 	
-		for k, v in ipairs( datapad.OpenApps ) do
+		for k, v in ipairs( datapad.OpenApps ) do		
 			local openApp = vgui.Create( "DButton" )
 			openApp:SetText( v[2] )
 			openApp:SetColor( color_black )
 			openApp:SetSize( math.min( numMath * 0.85, ScrW() * 0.07 ), 27 )
 			
-			local out_clr = Color( 150, 150, 150 )
+			local out_clr = Color( 100, 100, 100 )
 			local in_clr = Color( 200, 200, 200 )
-			local in_clr_sel = Color( 100, 100, 100 )
-			
+			local in_clr_sel = Color( 150, 150, 150 )
 			openApp.Paint = function( self, w, h )
 				surface.SetDrawColor( out_clr:Unpack() )
 				surface.DrawOutlinedRect( 0, 0, w, h, 5 )
@@ -150,9 +153,13 @@ local function taskBar( background )
 				v[1]:MoveToFront()
 			end
 			
-			openApps:AddItem( openApp )
+			datapad.TaskBar:AddItem( openApp )
 		end
-	end )
+	end
+	
+	hook.Add( "DatapadPostAppStart", "DatapadAddAppToTaskBar", fillTaskBar )
+	
+	hook.Add( "DatapadAppClosed", "DatapadRemoveAppFromTaskBar", fillTaskBar )
 	
 	local dateTime = vgui.Create( "DLabel", bar )
 	dateTime:SetText( "" )

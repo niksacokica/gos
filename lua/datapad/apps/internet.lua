@@ -16,7 +16,7 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.001, h * 0.002, w * 0.999, h * 0.056 )
+			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.9985, h * 0.056 )
 		end
 		
 		local html = vgui.Create( "DHTML", window )

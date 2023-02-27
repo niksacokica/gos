@@ -18,13 +18,13 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.998, h * 0.998 )
+			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.9985, h * 0.998 )
 			
 			surface.SetDrawColor( back_clr_left )
 			surface.DrawRect( w * 0.0015, h * 0.058, w * 0.282, h * 0.942 )
 			
 			surface.SetDrawColor( back_clr_right )
-			surface.DrawRect( w * 0.282, h * 0.058, w * 0.718, h * 0.942 )
+			surface.DrawRect( w * 0.282, h * 0.058, w * 0.7185, h * 0.942 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )

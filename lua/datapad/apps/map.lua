@@ -50,7 +50,7 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.998, h * 0.998 )
+			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.9985, h * 0.998 )
 			
 			if not camPos then
 				surface.SetDrawColor( color_black )
