@@ -161,12 +161,12 @@ datapad:AddApp({
 		window.OnMouseWheeled = function( self, data )
 			if not camPos then return end
 		
-			local mod = ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000
+			local mod = ( ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000 ) * zoomMod
 		
 			if data > 0 and mod > 0.5 then
-				camPos.z = camPos.z - 100 * mod * zoomMod
+				camPos.z = camPos.z - 100 * mod
 			elseif data < 0 and ( doLineTraceUD( true )["HitPos"].z - camPos.z ) / 1000 > 1 then
-				camPos.z = camPos.z + 100 * mod * zoomMod
+				camPos.z = camPos.z + 100 * mod
 			end
 		end
 		
@@ -175,13 +175,13 @@ datapad:AddApp({
 		window.OnCursorMoved = function( self, x, y )
 			if input.IsMouseDown( MOUSE_LEFT ) and camPos then
 				if lastPress then
-					local mod = ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000
+					local mod = ( ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000 ) * panMod
 					
 					local tempPos = Vector( camPos )
 					
 					camPos:Rotate( Angle( 0, camAng.r, 0 ) )
-					camPos.x = camPos.x - ( lastPress.y - y ) * mod * panMod
-					camPos.y = camPos.y - ( lastPress.x - x ) * mod * panMod
+					camPos.x = camPos.x - ( lastPress.y - y ) * mod
+					camPos.y = camPos.y - ( lastPress.x - x ) * mod
 					camPos:Rotate( Angle( 0, -camAng.r, 0 ) )
 					
 					if doHullTrace( camPos ) then camPos = tempPos end
