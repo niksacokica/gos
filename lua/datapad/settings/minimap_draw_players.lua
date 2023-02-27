@@ -5,7 +5,7 @@ datapad:AddSetting({
 	["description"] = "Enable/disable the drawing of other players.",
 	["category"] = "Minimap",
 	["subCategory"] = "Drawing",
-	["visible"] = function( ply )
+	["visible"] = function()
 		return true
 	end,
 	["function"] = function()
@@ -14,7 +14,7 @@ datapad:AddSetting({
 		toggle:SetSize( ScrW() * 0.05, ScrH() * 0.04 )
 		toggle:SetValue( datapad:GetSetting( "mm_draw_ply", false ) )
 		
-		local togPos = toggle:GetChecked() and 0.0288 or 0.011
+		local togPos = toggle:GetChecked() and 0.0285 or 0.0115
 		local clicked = false
 		
 		local function drawCircle( x, y, radius, seg )
@@ -40,13 +40,13 @@ datapad:AddSetting({
 			
 			draw.NoTexture()
 			surface.SetDrawColor( color_white:Unpack() )
-			drawCircle( ScrW() * togPos, ScrH() * 0.02, ScrH() * 0.017, 50 )
+			drawCircle( ScrW() * togPos, ScrH() * 0.02, ScrH() * 0.0178, 50 )
 			
 			if not clicked then return end
 			if toggle:GetChecked() then
-				togPos = Lerp( 0.1, togPos, 0.0288 )
+				togPos = Lerp( 0.1, togPos, 0.0285 )
 				
-				if togPos == 0.0288 then clicked = false end
+				if togPos == 0.0285 then clicked = false end
 			else
 				togPos = Lerp( 0.1, togPos, 0.011 )
 				

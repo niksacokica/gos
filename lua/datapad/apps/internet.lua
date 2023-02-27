@@ -8,7 +8,7 @@ datapad:AddApp({
 		window:ShowCloseButton( false )
 		window:SetTitle( "" )
 		
-		local back_clr = Color( 50, 50, 50 )
+		local back_clr = Color( 40, 40, 40 )
 		local color_gray = Color( 150, 150, 150 )
 		local color_red = Color( 255, 35, 35)
 		window.Paint = function( self, w, h )
@@ -26,7 +26,7 @@ datapad:AddApp({
 		
 		local ctrls = vgui.Create( "DHTMLControls", window )
 		ctrls:SetPos( ScrW() * 0.0005, ScrH() * 0.001 )
-		ctrls:SetSize( ScrW() * 0.4995, ScrH() * 0.028 )
+		ctrls:SetSize( ScrW() * 0.49, ScrH() * 0.028 )
 		ctrls:SetHTML( html )
 		
 		local cls = vgui.Create( "DButton", window )

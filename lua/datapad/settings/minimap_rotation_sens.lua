@@ -5,7 +5,7 @@ datapad:AddSetting({
 	["description"] = "Adjust the rotation sensitivity.",
 	["category"] = "Minimap",
 	["subCategory"] = "Sensitivity",
-	["visible"] = function( ply )
+	["visible"] = function()
 		return true
 	end,
 	["function"] = function( args, window )

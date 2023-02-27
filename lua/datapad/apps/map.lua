@@ -194,12 +194,15 @@ datapad:AddApp({
 		end
 		
 		local rotMod = datapad:GetSetting( "mm_rot_sens", 1 )
+		local keyLeft = datapad:GetSetting( "mm_rot_left", KEY_Q )
+		local keyRight = datapad:GetSetting( "mm_rot_right", KEY_E )
 		window.Think = function( self )
-			if input.IsKeyDown( KEY_Q ) then
+			if input.IsKeyDown( keyLeft ) and self:HasFocus() then
 				camAng.r = camAng.r + rotMod
 				
 				camAng:Normalize()
-			elseif input.IsKeyDown( KEY_E ) then
+			end
+			if input.IsKeyDown( keyRight ) and self:HasFocus() then
 				camAng.r = camAng.r - rotMod
 				
 				camAng:Normalize()
@@ -243,6 +246,10 @@ datapad:AddApp({
 				rotMod = newValue
 			elseif setting == "mm_zoom_sens" then
 				zoomMod = newValue
+			elseif setting == "mm_rot_left" then
+				keyLeft = newValue
+			elseif setting == "mm_rot_right" then
+				keyRight = newValue
 			end
 		end	)
 		

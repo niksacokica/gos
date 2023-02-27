@@ -1,18 +1,18 @@
 datapad:AddSetting({
-	["setting"] = "cc_dark_mode",
+	["setting"] = "dev_mode",
 	["creator"] = "niksacokica",
-	["title"] = "Calculator Dark Mode",
-	["description"] = "Enable/disable calculator dark mode.",
-	["category"] = "Calculator",
-	["subCategory"] = "Appearance",
-	["visible"] = function()
-		return true
+	["title"] = "Developer mode",
+	["description"] = "Enable/disable developer mode ( admin+ ).",
+	["category"] = "General",
+	["subCategory"] = "Developers",
+	["visible"] = function()	
+		return LocalPlayer():IsAdmin()
 	end,
 	["function"] = function()
 		local toggle = vgui.Create( "DCheckBox" )
 		toggle:SetPos( 0, 0 )
 		toggle:SetSize( ScrW() * 0.05, ScrH() * 0.04 )
-		toggle:SetValue( datapad:GetSetting( "cc_dark_mode", false ) )
+		toggle:SetValue( datapad.devMode )
 		
 		local togPos = toggle:GetChecked() and 0.0285 or 0.0115
 		local clicked = false
@@ -54,11 +54,17 @@ datapad:AddSetting({
 			end
 		end
 		
-		function toggle:OnChange( val )		
+		function toggle:OnChange( val )
 			clicked = true
 			
-			datapad:SaveSetting( "cc_dark_mode", val )
+			net.Start( "datapad_set_dev" )
+				net.WriteBool( not datapad.devMode )
+			net.SendToServer()
 		end
+		
+		hook.Add( "DatapadSettingsNewValue", "DatapadDevModeChanged", function( setting, newValue )
+			toggle:SetValue( newValue )
+		end )
 	
 		return 0.05, 0.1, toggle
 	end

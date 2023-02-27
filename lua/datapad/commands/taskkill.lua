@@ -19,7 +19,7 @@ datapad:AddCommand({
 		local srch = string.lower( table.concat( args, " ", 3 ) )
 		if string.upper( args[2] ) == "/FI" then
 			ret = "Successfully terminated the following apps:\n"
-			for key, val in ipairs( datapad.screen.OpenApps ) do
+			for key, val in ipairs( datapad.OpenApps ) do
 				if string.lower( val[2] ) == srch then
 					ret = ret .. val[2] .. " (id:" .. key .. ")\n"
 					val[1]:Remove()
@@ -28,11 +28,11 @@ datapad:AddCommand({
 			
 			ret = ( ret == "Successfully terminated the following apps:\n" and "ERROR: No apps with name \"" .. srch .. "\" found.\n"  or ret )
 		else
-			local exists = ( num <= #datapad.screen.OpenApps and num > 0 )
+			local exists = ( num <= #datapad.OpenApps and num > 0 )
 			
 			ret = ( exists and "Successfully terminated the app with the id " .. num .. ".\n" or
 				"ERROR: The app with the id of " .. num .. " not found.\n" )
-			datapad.screen.OpenApps[num][1]:Remove()
+			datapad.OpenApps[num][1]:Remove()
 		end
 		
 		return ret

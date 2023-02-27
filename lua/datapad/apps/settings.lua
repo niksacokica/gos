@@ -21,10 +21,10 @@ datapad:AddApp({
 			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.998, h * 0.998 )
 			
 			surface.SetDrawColor( back_clr_left )
-			surface.DrawRect( w * 0.0015, h * 0.059, w * 0.282, h * 0.942 )
+			surface.DrawRect( w * 0.0015, h * 0.058, w * 0.282, h * 0.942 )
 			
 			surface.SetDrawColor( back_clr_right )
-			surface.DrawRect( w * 0.282, h * 0.059, w * 0.718, h * 0.942 )
+			surface.DrawRect( w * 0.282, h * 0.058, w * 0.718, h * 0.942 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
@@ -139,7 +139,7 @@ datapad:AddApp({
 						
 						local sRight = vgui.Create( "DPanel", sBack )
 						sRight:Dock( RIGHT )
-						sRight:DockMargin( 0, 0, 5, 0 )
+						sRight:DockMargin( sPan:GetDockMargin() )
 						sRight.Paint = function( self, w, h )
 						end
 						
@@ -161,6 +161,8 @@ datapad:AddApp({
 						sDesc:SetHeight( sLeft:GetTall() )
 						sDesc:Dock( TOP )
 						sDesc:DockMargin( 5, 0, 0, 0 )
+						
+						if not s["visible"]() then sPan:Remove() end
 					end
 				end
 			end
@@ -178,16 +180,18 @@ function datapad:AddSetting( setting )
 	self.settings = istable( self.settings ) and self.settings or {}
 	
 	local sn = string.lower( setting["setting"] )
+	setting["category"] = #setting["category"] > 0 and setting["category"] or "General"
+	setting["subCategory"] = #setting["subCategory"] > 0 and setting["subCategory"] or "General"
 	
-	if #sn == 0 or #setting["category"] == 0 or #setting["subCategory"] == 0 then return end
+	if #sn == 0 then return end
 	
-	--if istable( self.settings[setting["category"]][setting["subCategory"]][sn] ) then
-		--ErrorNoHalt( "Setting with the name '" .. sn .. "' already exists for the path '" .. setting["category"] .. "/" .. setting["subCategory"] .. "'!" )
-	--else
+	if istable( self.settings[setting["category"]] ) and istable( self.settings[setting["category"]][setting["subCategory"]] ) and istable( self.settings[setting["category"]][setting["subCategory"]][sn] ) and not datapad.devMode then
+		ErrorNoHalt( "Setting with the name '" .. sn .. "' already exists for the path '" .. setting["category"] .. "/" .. setting["subCategory"] .. "'!" )
+	else
 		self.settings[setting["category"]] = istable( self.settings[setting["category"]] ) and self.settings[setting["category"]] or {}
 		self.settings[setting["category"]][setting["subCategory"]] = istable( self.settings[setting["category"]][setting["subCategory"]] ) and self.settings[setting["category"]][setting["subCategory"]] or {}
 		self.settings[setting["category"]][setting["subCategory"]][sn] = setting
-	--end
+	end
 end
 
 function datapad:GetSetting( setting, defaultReturn )

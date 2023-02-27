@@ -1,27 +1,5 @@
 datapad = istable( datapad ) and datapad or {}
-
-function datapad:AddApp( app )
-	self.apps = istable( self.apps ) and self.apps or {}
-	
-	local hookReturn = hook.Run( "DatapadAddApp", app )
-	
-	if #app["name"] == 0 then
-		return
-	--elseif istable( self.apps[app["name"]] ) then
-		--ErrorNoHalt( "App with the name  '" .. app["name"] .. "'  already exists!" )
-	elseif not hookReturn then
-		self.apps[string.lower( app["name"] )] = app
-	end
-end
-
-local files, directories = file.Find( "datapad/*", "LUA" )
-
-for _, dir in ipairs( directories ) do
-	files, directories = file.Find( "datapad/" .. dir .. "/*.lua", "LUA" )
-	for _, v in ipairs( files ) do
-		include( "datapad/" .. dir .. "/" .. v )
-	end
-end
+datapad.devMode = nil
 
 if not file.Exists( "datapad/personal_files/appdata", "DATA" ) then
 	file.CreateDir( "datapad/personal_files/appdata" )
@@ -33,9 +11,23 @@ if not file.Exists( "datapad/personal_files/documents", "DATA" ) then
 	file.CreateDir( "datapad/personal_files/documents" )
 end
 
+function datapad:AddApp( app )
+	self.apps = istable( self.apps ) and self.apps or {}
+	
+	local hookReturn = hook.Run( "DatapadAddApp", app )
+	
+	if #app["name"] == 0 then
+		return
+	elseif istable( self.apps[app["name"]] ) and not datapad.devMode then
+		ErrorNoHalt( "App with the name  '" .. app["name"] .. "'  already exists!" )
+	elseif not hookReturn then
+		self.apps[string.lower( app["name"] )] = app
+	end
+end
+
 function datapad:StartApp( v )
 	local hookReturn = hook.Run( "DatapadPreAppStart", v )
-	if hookReturn then return end
+	if hookReturn or #self.OpenApps >= 66 then return end
 
 	local window = vgui.Create( "DFrame" )
 	window:Center()
@@ -48,9 +40,9 @@ function datapad:StartApp( v )
 			window:OnDelete()
 		end
 	
-		for key, val in ipairs( self.screen.OpenApps ) do
+		for key, val in ipairs( self.OpenApps ) do
 			if val[2] == v["name"] and val[1] == window then
-				table.remove( self.screen.OpenApps, key )
+				table.remove( self.OpenApps, key )
 				
 				return
 			end
@@ -64,7 +56,7 @@ function datapad:StartApp( v )
 		handleWindowClose()
 	end
 	
-	table.insert( self.screen.OpenApps, { window, v["name"] } )
+	table.insert( self.OpenApps, { window, v["name"], v["icon"] } )
 	v["window"]( window )
 	
 	hook.Run( "DatapadPostAppStart", v )
@@ -126,6 +118,42 @@ local function taskBar( background )
 		surface.DrawTexturedRect( 0, 0, w, h )
 	end
 	
+	local openApps = vgui.Create( "DGrid", bar )
+	openApps:SetPos( 40, 3 )
+	hook.Add( "DatapadPostAppStart", "DatapadAddAppToTaskBar", function( app )
+		openApps:Clear()
+		openApps.Items = {}
+		
+		local numMath = ( 1 / #datapad.OpenApps ) * ScrW()
+		openApps:SetCols( #datapad.OpenApps )
+		openApps:SetColWide( math.min( numMath * 0.937, ScrW() * 0.075 ) )
+	
+		for k, v in ipairs( datapad.OpenApps ) do
+			local openApp = vgui.Create( "DButton" )
+			openApp:SetText( v[2] )
+			openApp:SetColor( color_black )
+			openApp:SetSize( math.min( numMath * 0.85, ScrW() * 0.07 ), 27 )
+			
+			local out_clr = Color( 150, 150, 150 )
+			local in_clr = Color( 200, 200, 200 )
+			local in_clr_sel = Color( 100, 100, 100 )
+			
+			openApp.Paint = function( self, w, h )
+				surface.SetDrawColor( out_clr:Unpack() )
+				surface.DrawOutlinedRect( 0, 0, w, h, 5 )
+				
+				surface.SetDrawColor( ( v[1]:HasFocus() and in_clr_sel or in_clr ):Unpack() )
+				surface.DrawRect( 1, 1, w - 2, h - 2 )
+			end
+			
+			openApp.DoClick = function()
+				v[1]:MoveToFront()
+			end
+			
+			openApps:AddItem( openApp )
+		end
+	end )
+	
 	local dateTime = vgui.Create( "DLabel", bar )
 	dateTime:SetText( "" )
 	dateTime:SetPos( ScrW() - 66, 3 )
@@ -175,7 +203,7 @@ function datapad:createScreen()
 	background:SetPopupStayAtBack( true )
 	background:ShowCloseButton( false )
 	
-	background.OpenApps = {}
+	self.OpenApps = {}
 	self.screen = background
 	
 	background.Paint = function( self, w, h )
@@ -188,7 +216,7 @@ function datapad:createScreen()
 	end
 	
 	local grid = vgui.Create( "DGrid", background )
-	grid:SetPos( ScrW()*0.01 , math.max( ScrH()*0.05, 100 ) )
+	grid:SetPos( ScrW()*0.01 , 100 )
 	grid:SetCols( 10 )
 	grid:SetColWide( ScrW() * 0.099 )
 	grid:SetRowHeight( ScrH() * 0.193 )	
@@ -214,6 +242,26 @@ function surface.DrawCircleFilled( x, y, radius, seg )
 	surface.DrawPoly( cir )
 end
 
-net.Receive( "datapad_open", function(len)
+net.Receive( "datapad_open", function()
 	datapad:createScreen()
+end )
+
+net.Receive( "datapad_get_dev", function()
+	datapad.devMode = net.ReadBool()
+	
+	if not net.ReadBool() then return end
+	
+	local files, directories = file.Find( "datapad/*", "LUA" )
+
+	for _, dir in ipairs( directories ) do
+		files, directories = file.Find( "datapad/" .. dir .. "/*.lua", "LUA" )
+		for _, v in ipairs( files ) do
+			include( "datapad/" .. dir .. "/" .. v )
+		end
+	end
+end )
+
+hook.Add( "InitPostEntity", "DatapadPlayerLoaded", function()
+	net.Start( "datapad_ply_first" )
+	net.SendToServer()
 end )

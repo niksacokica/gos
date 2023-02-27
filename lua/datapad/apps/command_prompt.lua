@@ -45,7 +45,7 @@ datapad:AddApp({
 			
 			surface.SetFont( "DermaDefaultBold" )
 			surface.SetTextColor( color_black )
-			surface.SetTextPos( w * 0.05, h * 0.022 ) 
+			surface.SetTextPos( w * 0.05, h * 0.025 ) 
 			surface.DrawText( window.title )
 			
 			surface.SetDrawColor( color_white )
@@ -267,10 +267,10 @@ function datapad:AddCommand( cmd )
 	local cl = string.lower( cmd["cmd"] )
 	if #cmd["cmd"] == 0 then
 		return
-	--elseif istable( self.cmds[cl] ) then
-		--ErrorNoHalt( "Command with the name '" .. cl .. "' already exists!" )
-	--elseif #cl > 14 then
-		--ErrorNoHalt( "Command name '" .. cl .. "' is too long, max length is 14 characters!" )
+	elseif istable( self.cmds[cl] ) and not datapad.devMode then
+		ErrorNoHalt( "Command with the name '" .. cl .. "' already exists!" )
+	elseif #cl > 14 then
+		ErrorNoHalt( "Command name '" .. cl .. "' is too long, max length is 14 characters!" )
 	else
 		self.cmds[cl] = cmd
 	end

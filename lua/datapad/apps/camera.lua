@@ -110,22 +110,5 @@ datapad:AddApp({
 			surface.SetDrawColor( 255, 255, 255, 255 )
 			surface.DrawCircleFilled( w * 0.5, h * 0.5, h * 0.125, 50 )
 		end
-		
-		local settings = vgui.Create( "DButton", window )
-		settings:SetText( "" )
-		settings:SetPos( ScrW() * 0.005, ScrH() * 0.008 )
-		settings:SetSize( ScrH() * 0.1, ScrH() * 0.1 )
-		settings.DoClick = function()
-			
-		end
-		
-		local cog = Material( "icon16/cog.png" )
-		settings.Paint = function( self, w, h )
-			draw.NoTexture()
-		
-			surface.SetMaterial( cog )
-			surface.SetDrawColor( 255, 255, 255, 255 )
-			surface.DrawTexturedRect( 0, 0, w * 0.16, h * 0.16 )
-		end
 	end
 })

@@ -12,7 +12,7 @@ datapad:AddCommand({
 		
 		local ret = ""
 		local srch = string.lower( table.concat( args, " ", 3 ) )
-		for key, val in ipairs( datapad.screen.OpenApps ) do
+		for key, val in ipairs( datapad.OpenApps ) do
 			if #args == 1 || ( #args > 1 and string.lower( val[2] ) == srch ) then
 				ret = ret .. val[2] .. " (id:" .. key .. ")\n"
 			end
