@@ -38,10 +38,10 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( background_color )
-			surface.DrawRect( w * 0.001, h * 0.072, w * 0.999, h * 0.928 )
+			surface.DrawRect( w * 0.0015, h * 0.072, w * 0.998, h * 0.928 )
 			
 			surface.SetDrawColor( color_white )
-			surface.DrawRect( w * 0.001, h * 0.003, w * 0.999, h * 0.07 )
+			surface.DrawRect( w * 0.0015, h * 0.003, w * 0.998, h * 0.07 )
 			
 			surface.SetFont( "DermaDefaultBold" )
 			surface.SetTextColor( color_black )

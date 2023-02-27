@@ -50,7 +50,7 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.001, h * 0.002, w * 0.999, h * 0.998 )
+			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.998, h * 0.998 )
 			
 			if not camPos then
 				surface.SetDrawColor( color_black )
@@ -196,11 +196,11 @@ datapad:AddApp({
 		local rotMod = datapad:GetSetting( "mm_rot_sens", 1 )
 		window.Think = function( self )
 			if input.IsKeyDown( KEY_Q ) then
-				camAng.r = camAng.r + 0.5 * rotMod
+				camAng.r = camAng.r + rotMod
 				
 				camAng:Normalize()
 			elseif input.IsKeyDown( KEY_E ) then
-				camAng.r = camAng.r - 0.5 * rotMod
+				camAng.r = camAng.r - rotMod
 				
 				camAng:Normalize()
 			end

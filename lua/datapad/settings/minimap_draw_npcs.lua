@@ -3,8 +3,11 @@ datapad:AddSetting({
 	["creator"] = "niksacokica",
 	["title"] = "Minimap Draw NPCs",
 	["description"] = "Enable/disable the drawing of NPCs.",
-	["category"] = "minimap",
-	["subCategory"] = "drawing",
+	["category"] = "Minimap",
+	["subCategory"] = "Drawing",
+	["visible"] = function( ply )
+		return true
+	end,
 	["function"] = function()
 		local toggle = vgui.Create( "DCheckBox" )
 		toggle:SetPos( 0, 0 )
@@ -37,7 +40,7 @@ datapad:AddSetting({
 			
 			draw.NoTexture()
 			surface.SetDrawColor( color_white:Unpack() )
-			drawCircle( ScrW() * togPos, ScrH() * 0.02, ScrH() * 0.017, 25 )
+			drawCircle( ScrW() * togPos, ScrH() * 0.02, ScrH() * 0.017, 50 )
 			
 			if not clicked then return end
 			if toggle:GetChecked() then

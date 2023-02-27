@@ -13,28 +13,36 @@ datapad:AddApp({
 		window:ShowCloseButton( false )
 		window:SetTitle( "" )
 		
-		local background_color = Color( 222, 222, 222, 232 )
+		local darkMode = datapad:GetSetting( "cc_dark_mode", false )
+		hook.Add( "DatapadSettingsNewValue", "MinimapSettingsChanged", function( setting, newValue )
+			if setting == "cc_dark_mode" then
+				darkMode = newValue
+			end
+		end	)
+		
+		local light_back = Color( 222, 222, 222, 232 )
+		local dark_back = Color( 22, 22, 22, 232 )
 		local color_gray = Color( 150, 150, 150 )
 		local color_red = Color( 255, 35, 35)
 		window.Paint = function( self, w, h )
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
-			surface.SetDrawColor( background_color )
-			surface.DrawRect( w * 0.004, h * 0.002, w * 0.997, h * 0.998 )
+			surface.SetDrawColor( darkMode and dark_back or light_back )
+			surface.DrawRect( w * 0.004, h * 0.002, w * 0.996, h * 0.998 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
 		cls:SetText( "" )
-		cls:SetPos( ScrW() * 0.1446, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.1447, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.025, ScrH() * 0.03 )
 		cls.DoClick = function()
 			window:Close()
 		end
 		
-		local xClr = Color( 255, 255, 255, 0 )
+		local back_clr = Color( 0, 0, 0, 0 )
 		cls.Paint = function( self, w, h )
-			surface.SetDrawColor( cls:IsHovered() and color_red or xClr )
+			surface.SetDrawColor( cls:IsHovered() and color_red or back_clr )
 			surface.DrawRect( 0, 0, w, h )
 			
 			draw.NoTexture()
@@ -222,10 +230,13 @@ datapad:AddApp({
 		}
 		
 		local clrGrey = Color( 242, 242, 242 )
+		local dClrGrey = Color( 24, 24, 24 )
+		local dWhite = Color( 48, 48, 48 )
 		local buttons = {
 			["%"] = {
 				["pos"] = 1,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:Percentage()
 				end
@@ -233,6 +244,7 @@ datapad:AddApp({
 			["CE"] = {
 				["pos"] = 2,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:CE()
 				end
@@ -240,6 +252,7 @@ datapad:AddApp({
 			["C"] = {
 				["pos"] = 3,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:C()
 				end
@@ -247,6 +260,7 @@ datapad:AddApp({
 			["DEL"] = {
 				["pos"] = 4,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:DEL()
 				end
@@ -255,6 +269,7 @@ datapad:AddApp({
 			["1/X"] = {
 				["pos"] = 5,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:Inv()
 				end
@@ -262,6 +277,7 @@ datapad:AddApp({
 			["x²"] = {
 				["pos"] = 6,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:Pow()
 				end
@@ -269,6 +285,7 @@ datapad:AddApp({
 			["2√X"] = {
 				["pos"] = 7,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:Sqrt()
 				end
@@ -276,6 +293,7 @@ datapad:AddApp({
 			["/"] = {
 				["pos"] = 8,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:BasicMath( "/" )
 				end
@@ -284,6 +302,7 @@ datapad:AddApp({
 			["7"] = {
 				["pos"] = 9,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 7 )
 				end
@@ -291,6 +310,7 @@ datapad:AddApp({
 			["8"] = {
 				["pos"] = 10,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 8 )
 				end
@@ -298,6 +318,7 @@ datapad:AddApp({
 			["9"] = {
 				["pos"] = 11,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 9 )
 				end
@@ -305,6 +326,7 @@ datapad:AddApp({
 			["X"] = {
 				["pos"] = 12,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:BasicMath( "X" )
 				end
@@ -313,6 +335,7 @@ datapad:AddApp({
 			["4"] = {
 				["pos"] = 13,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 4 )
 				end
@@ -320,6 +343,7 @@ datapad:AddApp({
 			["5"] = {
 				["pos"] = 14,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 5 )
 				end
@@ -327,6 +351,7 @@ datapad:AddApp({
 			["6"] = {
 				["pos"] = 15,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 6 )
 				end
@@ -334,6 +359,7 @@ datapad:AddApp({
 			["-"] = {
 				["pos"] = 16,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:BasicMath( "-" )
 				end
@@ -342,6 +368,7 @@ datapad:AddApp({
 			["1"] = {
 				["pos"] = 17,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 1 )
 				end
@@ -349,6 +376,7 @@ datapad:AddApp({
 			["2"] = {
 				["pos"] = 18,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 2 )
 				end
@@ -356,6 +384,7 @@ datapad:AddApp({
 			["3"] = {
 				["pos"] = 19,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddNum( 3 )
 				end
@@ -363,6 +392,7 @@ datapad:AddApp({
 			["+"] = {
 				["pos"] = 20,
 				["clr"] = clrGrey,
+				["dClr"] = dClrGrey,
 				["func"] = function()
 					calc:BasicMath( "+" )
 				end
@@ -371,6 +401,7 @@ datapad:AddApp({
 			["+/-"] = {
 				["pos"] = 21,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:ChangeSign()
 				end
@@ -378,6 +409,7 @@ datapad:AddApp({
 			["0"] = {
 				["pos"] = 22,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()	
 					calc:AddNum( 0 )
 				end
@@ -385,6 +417,7 @@ datapad:AddApp({
 			["."] = {
 				["pos"] = 23,
 				["clr"] = color_white,
+				["dClr"] = dWhite,
 				["func"] = function()
 					calc:AddDecimal()
 				end
@@ -392,6 +425,7 @@ datapad:AddApp({
 			["="] = {
 				["pos"] = 24,
 				["clr"] = Color( 153, 204, 234 ),
+				["dClr"] = Color( 0, 0, 75 ),
 				["func"] = function()
 					calc:Eq()
 				end
@@ -418,7 +452,7 @@ datapad:AddApp({
 			local pvrb = Color( 38, 166, 242 )
 			but.UpdateColours = function( self, skin ) end
 			but.Paint = function( self, w, h )
-				surface.SetDrawColor( ( but:IsDown() and ( k == "=" and pvrb or pvrg ) or ( but:IsHovered() and ( k== "=" and hvrb or hvrg ) or v["clr"] ) ):Unpack() )
+				surface.SetDrawColor( ( but:IsDown() and ( k == "=" and pvrb or pvrg ) or ( but:IsHovered() and ( k== "=" and hvrb or hvrg ) or darkMode and v["dClr"] or v["clr"] ) ):Unpack() )
 				surface.DrawRect( 0, 0, w, h )
 			end
 			but.DoClick = v["func"]

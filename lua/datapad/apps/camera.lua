@@ -16,7 +16,7 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.001, h * 0.002, w * 0.999, h * 0.998 )
+			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.998, h * 0.998 )
 			
 			local x, y = self:GetPos()
 			

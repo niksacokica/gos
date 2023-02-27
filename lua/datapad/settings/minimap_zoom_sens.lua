@@ -3,8 +3,11 @@ datapad:AddSetting({
 	["creator"] = "niksacokica",
 	["title"] = "Minimap Zoom Sensitivity",
 	["description"] = "Adjust the zoom sensitivity.",
-	["category"] = "minimap",
-	["subCategory"] = "sensitivity",
+	["category"] = "Minimap",
+	["subCategory"] = "Sensitivity",
+	["visible"] = function( ply )
+		return true
+	end,
 	["function"] = function()
 		local slider = vgui.Create( "DNumSlider" )
 		slider:SetPos( 0, ScrH() * 0.015 )

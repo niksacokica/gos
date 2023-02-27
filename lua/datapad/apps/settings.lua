@@ -9,6 +9,8 @@ datapad:AddApp({
 		window:SetTitle( "" )
 		
 		local back_clr = Color( 50, 50, 50 )
+		local back_clr_left = Color( 70, 70, 70 )
+		local back_clr_right = Color( 60, 60, 60 )
 		local color_gray = Color( 150, 150, 150 )
 		local color_red = Color( 255, 35, 35)
 		window.Paint = function( self, w, h )
@@ -16,7 +18,13 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.001, h * 0.002, w * 0.999, h * 0.998 )
+			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.998, h * 0.998 )
+			
+			surface.SetDrawColor( back_clr_left )
+			surface.DrawRect( w * 0.0015, h * 0.059, w * 0.282, h * 0.942 )
+			
+			surface.SetDrawColor( back_clr_right )
+			surface.DrawRect( w * 0.282, h * 0.059, w * 0.718, h * 0.942 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
@@ -74,6 +82,7 @@ datapad:AddApp({
 		end
 		
 		local first = true
+		local selected = ""
 		for cn, c in SortedPairs( datapad.settings ) do
 			local cat = cats:Add( "DButton" )
 			cat:SetText( "" )
@@ -85,10 +94,16 @@ datapad:AddApp({
 			cat.Paint = function( self, w, h )				
 				draw.NoTexture()
 				draw.DrawText( cn, "DermaLarge", w * 0.5, h * 0.2, color_black, TEXT_ALIGN_CENTER )
+				
+				if cn == selected then
+					surface.SetDrawColor( color_black )
+					surface.DrawLine( w * 0.04, h * 0.98, w * 0.96, h * 0.98 )
+				end
 			end
 			
 			cat.DoClick = function()
 				sCats:Clear()
+				selected = cn
 			
 				for scn, sc in SortedPairs( c ) do
 					local sCat = sCats:Add( "DLabel" )
@@ -103,7 +118,7 @@ datapad:AddApp({
 						draw.DrawText( scn, "DermaLarge", 0, h * 0.09, color_white )
 						
 						surface.SetDrawColor( color_white )
-						surface.DrawLine( 0, h * 0.98, w * 0.99, h * 0.98 )
+						surface.DrawLine( 0, h * 0.98, w * 0.96, h * 0.98 )
 					end
 					
 					for sn, s in SortedPairs( sc ) do
@@ -163,17 +178,15 @@ function datapad:AddSetting( setting )
 	self.settings = istable( self.settings ) and self.settings or {}
 	
 	local sn = string.lower( setting["setting"] )
-	local sc = string.lower( setting["category"] )
-	local ssc = string.lower( setting["subCategory"] )
 	
-	if #sn == 0 or #sc == 0 or #ssc == 0 then return end
+	if #sn == 0 or #setting["category"] == 0 or #setting["subCategory"] == 0 then return end
 	
-	--if istable( self.settings[sc][ssc][sn] ) then
-		--ErrorNoHalt( "Setting with the name '" .. sn .. "' already exists for the path '" .. sc .. "/" .. ssc .. "'!" )
+	--if istable( self.settings[setting["category"]][setting["subCategory"]][sn] ) then
+		--ErrorNoHalt( "Setting with the name '" .. sn .. "' already exists for the path '" .. setting["category"] .. "/" .. setting["subCategory"] .. "'!" )
 	--else
-		self.settings[sc] = istable( self.settings[sc] ) and self.settings[sc] or {}
-		self.settings[sc][ssc] = istable( self.settings[sc][ssc] ) and self.settings[sc][ssc] or {}
-		self.settings[sc][ssc][sn] = setting
+		self.settings[setting["category"]] = istable( self.settings[setting["category"]] ) and self.settings[setting["category"]] or {}
+		self.settings[setting["category"]][setting["subCategory"]] = istable( self.settings[setting["category"]][setting["subCategory"]] ) and self.settings[setting["category"]][setting["subCategory"]] or {}
+		self.settings[setting["category"]][setting["subCategory"]][sn] = setting
 	--end
 end
 
@@ -185,7 +198,7 @@ function datapad:GetSetting( setting, defaultReturn )
 		file.Write( "datapad/personal_files/appdata/settings.json", util.TableToJSON( self.settingsValues, true ) )
 		
 		return defaultReturn
-	elseif not istable( self.settingsValues ) then
+	elseif table.IsEmpty( self.settingsValues ) then
 		self.settingsValues = util.JSONToTable( file.Read( "datapad/personal_files/appdata/settings.json", "DATA" ) )
 	end
 	

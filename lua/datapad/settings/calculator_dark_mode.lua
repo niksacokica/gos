@@ -1,10 +1,10 @@
 datapad:AddSetting({
-	["setting"] = "mm_draw_ply",
+	["setting"] = "cc_dark_mode",
 	["creator"] = "niksacokica",
-	["title"] = "Minimap Draw Other Player",
-	["description"] = "Enable/disable the drawing of other players.",
-	["category"] = "Minimap",
-	["subCategory"] = "Drawing",
+	["title"] = "Calculator Dark Mode",
+	["description"] = "Enable/disable calculator dark mode.",
+	["category"] = "Calculator",
+	["subCategory"] = "Appearance",
 	["visible"] = function( ply )
 		return true
 	end,
@@ -12,7 +12,7 @@ datapad:AddSetting({
 		local toggle = vgui.Create( "DCheckBox" )
 		toggle:SetPos( 0, 0 )
 		toggle:SetSize( ScrW() * 0.05, ScrH() * 0.04 )
-		toggle:SetValue( datapad:GetSetting( "mm_draw_ply", false ) )
+		toggle:SetValue( datapad:GetSetting( "cc_dark_mode", false ) )
 		
 		local togPos = toggle:GetChecked() and 0.0288 or 0.011
 		local clicked = false
@@ -57,9 +57,9 @@ datapad:AddSetting({
 		function toggle:OnChange( val )		
 			clicked = true
 			
-			datapad:SaveSetting( "mm_draw_ply", val )
+			datapad:SaveSetting( "cc_dark_mode", val )
 		end
 	
-		return 0.05, 0.13, toggle
+		return 0.05, 0.1, toggle
 	end
 })

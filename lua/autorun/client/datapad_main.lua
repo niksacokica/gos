@@ -105,14 +105,14 @@ local function taskBar( background )
 	
 	local bar = vgui.Create( "DPanel", background )
 	bar:SetPos( 0, 0 )
-	bar:SetSize( ScrW(), ScrH()*0.025 )
+	bar:SetSize( ScrW(), 33 )
 	bar:SetPaintBackground( true )
 	bar:MakePopup()
 	
 	local icon = vgui.Create( "DButton", bar )
 	icon:SetText( "" )
-	icon:SetPos( ScrW()*0.002, ScrH()*0.003 )
-	icon:SetSize( ScrH()*0.02, ScrH()*0.02 )
+	icon:SetPos( 3, 3 )
+	icon:SetSize( 27, 27 )
 	icon.DoClick = function()
 		background:Remove()
 	end
@@ -128,8 +128,8 @@ local function taskBar( background )
 	
 	local dateTime = vgui.Create( "DLabel", bar )
 	dateTime:SetText( "" )
-	dateTime:SetPos( ScrW() * 0.97, ScrH()*0.003 )
-	dateTime:SetSize( ScrW() * 0.025, ScrH()*0.02 )
+	dateTime:SetPos( ScrW() - 66, 3 )
+	dateTime:SetSize( 55, 30 )
 	
 	dateTime.Paint = function( self, w, h )
 		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "DermaDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
@@ -139,8 +139,8 @@ local function taskBar( background )
 	
 	local ping = vgui.Create( "DLabel", bar )
 	ping:SetText( "" )
-	ping:SetPos( ScrW() * 0.94, 0 )
-	ping:SetSize( ScrW() * 0.025, ScrH()*0.044 )
+	ping:SetPos( ScrW() - 125, 3 )
+	ping:SetSize( 50, 28 )
 	
 	local wifiMat = Material( "icon16/bullet_feed.png" )
 	ping.Paint = function( self, w, h )
@@ -152,7 +152,7 @@ local function taskBar( background )
 	
 		surface.SetMaterial( wifiMat )
 		surface.SetDrawColor( c:Unpack() )
-		surface.DrawTexturedRect( 0, 0, w*0.6, h*0.6 )
+		surface.DrawTexturedRect( 0, 0, w*0.6, h )
 		return true
 	end
 
@@ -188,7 +188,7 @@ function datapad:createScreen()
 	end
 	
 	local grid = vgui.Create( "DGrid", background )
-	grid:SetPos( ScrW()*0.01 , ScrH()*0.05 )
+	grid:SetPos( ScrW()*0.01 , math.max( ScrH()*0.05, 100 ) )
 	grid:SetCols( 10 )
 	grid:SetColWide( ScrW() * 0.099 )
 	grid:SetRowHeight( ScrH() * 0.193 )	
