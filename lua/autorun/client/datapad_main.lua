@@ -141,12 +141,19 @@ local function taskBar( background )
 			local out_clr = Color( 100, 100, 100 )
 			local in_clr = Color( 200, 200, 200 )
 			local in_clr_sel = Color( 150, 150, 150 )
+			local ico = Material( v[3] )
 			openApp.Paint = function( self, w, h )
 				surface.SetDrawColor( out_clr:Unpack() )
 				surface.DrawOutlinedRect( 0, 0, w, h, 5 )
 				
 				surface.SetDrawColor( ( v[1]:HasFocus() and in_clr_sel or in_clr ):Unpack() )
 				surface.DrawRect( 1, 1, w - 2, h - 2 )
+				
+				draw.NoTexture()
+	
+				surface.SetMaterial( ico )
+				surface.SetDrawColor( 255, 255, 255, 255 )
+				surface.DrawTexturedRect( 0, 0, w, h )
 			end
 			
 			openApp.DoClick = function()

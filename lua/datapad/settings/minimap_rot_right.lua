@@ -53,6 +53,6 @@ datapad:AddSetting({
 			clickPan:SetVisible( false )
 		end
 	
-		return 0.05, 0.1, bind
+		return 0.05, 0.11, bind
 	end
 })
