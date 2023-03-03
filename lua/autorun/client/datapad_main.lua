@@ -27,7 +27,7 @@ end
 
 function datapad:StartApp( v )
 	local hookReturn = hook.Run( "DatapadPreAppStart", v )
-	if hookReturn or #self.OpenApps >= 66 then return end
+	if hookReturn or #self.OpenApps >= math.floor( ( ScrW() - 250 ) / 40 ) then return end
 
 	local window = vgui.Create( "DFrame" )
 	window:Center()
@@ -97,15 +97,15 @@ local function taskBar( background )
 	
 	local bar = vgui.Create( "DPanel", background )
 	bar:SetPos( 0, 0 )
-	bar:SetSize( ScrW(), 33 )
+	bar:SetSize( ScrW(), 50 )
 	bar:SetPaintBackground( true )
 	bar:MakePopup()
 	bar:SetPopupStayAtBack( true )
 	
 	local icon = vgui.Create( "DButton", bar )
 	icon:SetText( "" )
-	icon:SetPos( 3, 3 )
-	icon:SetSize( 27, 27 )
+	icon:SetPos( 2, 2 )
+	icon:SetSize( 45, 45 )
 	icon.DoClick = function()
 		background:Remove()
 	end
@@ -120,40 +120,38 @@ local function taskBar( background )
 	end
 	
 	local openApps = vgui.Create( "DGrid", bar )
-	openApps:SetPos( 40, 3 )
+	openApps:SetPos( 55, 5 )
+	openApps:SetCols( math.floor( ( ScrW() - 250 ) / 40 ) )
+	openApps:SetColWide( 40 )
+	openApps:SetRowHeight( 40 )
 	datapad.TaskBar = openApps
 	
 	local function fillTaskBar()
 		if not IsValid( datapad.TaskBar ) then return end
 		datapad.TaskBar:Clear()
 		datapad.TaskBar.Items = {}
-		
-		local numMath = ( 1 / #datapad.OpenApps ) * ScrW()
-		datapad.TaskBar:SetCols( #datapad.OpenApps )
-		datapad.TaskBar:SetColWide( math.min( numMath * 0.937, ScrW() * 0.075 ) )
 	
 		for k, v in ipairs( datapad.OpenApps ) do		
 			local openApp = vgui.Create( "DButton" )
-			openApp:SetText( v[2] )
+			openApp:SetText( "" )
 			openApp:SetColor( color_black )
-			openApp:SetSize( math.min( numMath * 0.85, ScrW() * 0.07 ), 27 )
+			openApp:SetSize( 40, 40 )
 			
 			local out_clr = Color( 100, 100, 100 )
 			local in_clr = Color( 200, 200, 200 )
 			local in_clr_sel = Color( 150, 150, 150 )
 			local ico = Material( v[3] )
 			openApp.Paint = function( self, w, h )
-				surface.SetDrawColor( out_clr:Unpack() )
-				surface.DrawOutlinedRect( 0, 0, w, h, 5 )
-				
-				surface.SetDrawColor( ( v[1]:HasFocus() and in_clr_sel or in_clr ):Unpack() )
-				surface.DrawRect( 1, 1, w - 2, h - 2 )
+				if v[1]:HasFocus() then
+					surface.SetDrawColor( out_clr:Unpack() )
+					surface.DrawOutlinedRect( 0, 0, w, h, 2 )
+				end
 				
 				draw.NoTexture()
 	
 				surface.SetMaterial( ico )
 				surface.SetDrawColor( 255, 255, 255, 255 )
-				surface.DrawTexturedRect( 0, 0, w, h )
+				surface.DrawTexturedRect( 1, 1, w - 1, h - 1 )
 			end
 			
 			openApp.DoClick = function()
@@ -168,33 +166,33 @@ local function taskBar( background )
 	
 	hook.Add( "DatapadAppClosed", "DatapadRemoveAppFromTaskBar", fillTaskBar )
 	
-	local dateTime = vgui.Create( "DLabel", bar )
-	dateTime:SetText( "" )
-	dateTime:SetPos( ScrW() - 66, 3 )
-	dateTime:SetSize( 55, 30 )
-	
-	dateTime.Paint = function( self, w, h )
-		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "DermaDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
-		
-		return true
-	end
-	
 	local ping = vgui.Create( "DLabel", bar )
 	ping:SetText( "" )
-	ping:SetPos( ScrW() - 125, 3 )
-	ping:SetSize( 50, 28 )
+	ping:SetPos( ScrW() - 222, 0 )
+	ping:SetSize( 90, 50 )
 	
 	local wifiMat = Material( "icon16/bullet_feed.png" )
 	ping.Paint = function( self, w, h )
 		local p = LocalPlayer():Ping()
 		local c = Color( math.min( 255, p ), math.max( 0, 255 - p ), 0, 255 )
-		draw.DrawText( p, "GModNotify", w*0.7, h*0.1, c, TEXT_ALIGN_CENTER )
+		draw.DrawText( p, "DermaLarge", w*0.7, h*0.2, c, TEXT_ALIGN_CENTER )
 		
 		draw.NoTexture()
 	
 		surface.SetMaterial( wifiMat )
 		surface.SetDrawColor( c:Unpack() )
-		surface.DrawTexturedRect( 0, 0, w*0.6, h )
+		surface.DrawTexturedRect( 0, 0, w*0.55, h )
+		return true
+	end
+	
+	local dateTime = vgui.Create( "DLabel", bar )
+	dateTime:SetText( "" )
+	dateTime:SetPos( ScrW() - 131, 3 )
+	dateTime:SetSize( 125, 100 )
+	
+	dateTime.Paint = function( self, w, h )
+		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "HudDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
+		
 		return true
 	end
 
