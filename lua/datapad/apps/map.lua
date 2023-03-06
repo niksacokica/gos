@@ -64,8 +64,6 @@ datapad:AddApp({
 			end
 			
 			local x, y = self:GetPos()
-			local width = w - ScrH() * 0.03
-			local height = h - ScrH() * 0.045
 			
 			local old = DisableClipping( true )
 			render.RenderView( {
@@ -174,7 +172,7 @@ datapad:AddApp({
 		local panMod = datapad:GetSetting( "mm_pan_sens", 1 )
 		window.OnCursorMoved = function( self, x, y )
 			if input.IsMouseDown( MOUSE_LEFT ) and camPos then
-				if lastPress then
+				if lastPress and x > ScrW() * 0.008 and x < ScrW() * 0.5 - ScrW() * 0.015 and y > ScrH() * 0.03 and y < ScrH() * 0.5 - ScrH() * 0.045 then
 					local mod = ( ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000 ) * panMod
 					
 					local tempPos = Vector( camPos )
@@ -196,7 +194,10 @@ datapad:AddApp({
 		local rotMod = datapad:GetSetting( "mm_rot_sens", 1 )
 		local keyLeft = datapad:GetSetting( "mm_rot_left", KEY_Q )
 		local keyRight = datapad:GetSetting( "mm_rot_right", KEY_E )
+		local oldThink = window.Think
 		window.Think = function( self )
+			oldThink( self )
+		
 			if input.IsKeyDown( keyLeft ) and self:HasFocus() then
 				camAng.r = camAng.r + rotMod
 				
