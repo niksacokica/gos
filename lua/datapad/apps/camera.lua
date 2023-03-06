@@ -22,7 +22,7 @@ datapad:AddApp({
 			
 			local old = DisableClipping( true )
 			render.RenderView( {
-				origin = LocalPlayer():GetActiveWeapon():GetPos(),
+				origin = LocalPlayer():EyePos(),
 				angles = LocalPlayer():EyeAngles(),
 				fov = 75,
 				drawviewmodel = false,

@@ -73,7 +73,7 @@ SWEP.ViewModelBoneMods = {
 }
 	
 SWEP.VElements = {
-	["tablet"] = { model = "models/niksacokica/tablet/tablet.mdl", bone = "Slam_base", pos = Vector(2, -75, 14), angle = Angle(39, 13, 210), size = Vector(1.2, 1.2, 1.2) }
+	["tablet"] = { model = "models/niksacokica/tablet/tablet.mdl", bone = "Slam_base", pos = Vector(2, -75, 14), angle = Angle(220, 11, -25), size = Vector(1.2, 1.2, 1.2) }
 }
 
 function SWEP:Initialize()
