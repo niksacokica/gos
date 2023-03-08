@@ -36,5 +36,35 @@ datapad:AddApp({
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
 		end
+		
+		local inb = true
+		local sent = false
+		local inboxButt = vgui.Create( "DButton", window )
+		inboxButt:SetText( "" )
+		inboxButt:SetPos( ScrW() * 0.01, ScrH() * 0.0285 )
+		inboxButt:SetSize( 100, 40 )
+		inboxButt.DoClick = function( self )
+			self:MoveToFront()
+		end
+
+		local sentButt = vgui.Create( "DButton", window )
+		sentButt:SetText( "" )
+		sentButt:SetPos( ScrW() * 0.04, ScrH() * 0.0285 )
+		sentButt:SetSize( 100, 40 )
+		sentButt.DoClick = function( self )		
+			self:MoveToFront()
+		end
+		
+		local btn_selected = Color( 0, 0, 255 )
+		local btn_unselected = Color( 0, 0, 100 )
+		local function cardPaint( self, w, h )
+			local child = window:GetChildren()
+		
+			draw.RoundedBoxEx( 25, 0, 0, w, h, ( child[#child] == self and btn_selected or btn_unselected ), true, true )
+		end
+		
+		inboxButt.Paint = cardPaint
+		sentButt.Paint = cardPaint
+		inboxButt:DoClick()
 	end
 })
