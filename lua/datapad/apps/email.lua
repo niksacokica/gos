@@ -37,20 +37,32 @@ datapad:AddApp({
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
 		end
 		
-		local inb = true
-		local sent = false
+		local newButt = vgui.Create( "DButton", window )
+		newButt:SetText( "" )
+		newButt:SetPos( ScrW() * 0.42, ScrH() * 0.032 )
+		newButt:SetSize( 171, 30 )
+		newButt.inb = true
+		newButt.DoClick = function( self )
+		end
+		
+		newButt.Paint = function( self, w, h )
+			draw.RoundedBox( 25, 5, 0, w-5, h, color_gray )
+			draw.SimpleText( "NEW EMAIL", "DermaLarge", ScrW() * 0.034, ScrH() * 0.01, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		end
+		
 		local inboxButt = vgui.Create( "DButton", window )
 		inboxButt:SetText( "" )
 		inboxButt:SetPos( ScrW() * 0.01, ScrH() * 0.0285 )
-		inboxButt:SetSize( 100, 40 )
+		inboxButt:SetSize( 121, 40 )
+		inboxButt.inb = true
 		inboxButt.DoClick = function( self )
 			self:MoveToFront()
 		end
 
 		local sentButt = vgui.Create( "DButton", window )
 		sentButt:SetText( "" )
-		sentButt:SetPos( ScrW() * 0.04, ScrH() * 0.0285 )
-		sentButt:SetSize( 100, 40 )
+		sentButt:SetPos( ScrW() * 0.05, ScrH() * 0.0285 )
+		sentButt:SetSize( 121, 40 )
 		sentButt.DoClick = function( self )		
 			self:MoveToFront()
 		end
@@ -60,7 +72,8 @@ datapad:AddApp({
 		local function cardPaint( self, w, h )
 			local child = window:GetChildren()
 		
-			draw.RoundedBoxEx( 25, 0, 0, w, h, ( child[#child] == self and btn_selected or btn_unselected ), true, true )
+			draw.RoundedBoxEx( 50, 0, 0, w, h, ( child[#child] == self and btn_selected or btn_unselected ), true, true )
+			draw.SimpleText( self.inb and "Inbox" or "Sent", "DermaLarge", ScrW() * 0.023, ScrH() * 0.013, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		end
 		
 		inboxButt.Paint = cardPaint
