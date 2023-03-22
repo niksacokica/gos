@@ -192,8 +192,6 @@ local function taskBar( background )
 	dateTime.Paint = function( self, w, h )
 		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "HudDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
 	end
-	
-	PrintTable(bar:GetChildren())
 
 	hook.Run( "DatapadPostTaskBar" )
 end

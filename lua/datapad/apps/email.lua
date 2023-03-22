@@ -120,6 +120,13 @@ datapad:AddApp({
 		end
 		
 		local function sendEmail()
+			if #newEmailPanels == 0 or not newEmailPanels[2] or #newEmailPanels[2]:GetText() == 0 or not newEmailPanels[4] or #newEmailPanels[4]:GetText() == 0 or not newEmailPanels[5] or #newEmailPanels[5]:GetText() == 0 then return end
+		
+			net.Start( "datapad_email_send" )
+				net.WriteString( newEmailPanels[2]:GetText() )
+				net.WriteString( newEmailPanels[4]:GetText() )
+				net.WriteString( newEmailPanels[5]:GetText() )
+			net.SendToServer()
 		end
 		
 		local newButt = vgui.Create( "DButton", window )
