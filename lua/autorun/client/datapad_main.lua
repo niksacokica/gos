@@ -196,7 +196,6 @@ local function taskBar( background )
 	hook.Run( "DatapadPostTaskBar" )
 end
 
-local background_clr = Color(126, 185, 181)
 function datapad:createScreen()
 	local hookReturn = hook.Run( "DatapadPreScreenCreate" )
 	if hookReturn then return end
@@ -215,6 +214,7 @@ function datapad:createScreen()
 	self.OpenApps = {}
 	self.screen = background
 	
+	local background_clr = Color(126, 185, 181)
 	background.Paint = function( self, w, h )
 		surface.SetDrawColor( background_clr )
 		surface.DrawRect( 0, 0, w, h )

@@ -3,9 +3,12 @@ datapad:AddApp({
 	["icon"] = "datapad/app_icons/command_prompt.png",
 	["creator"] = "niksacokica",
 	["window"] = function( window )
-		window:SetPos( ScrW() * 0.3, ScrH() * 0.3 )
-		window:SetSize( ScrW() * 0.4, ScrH() * 0.4 )
+		window:SetPos( ScrW() * 0.5 - 512, ScrH() * 0.5 - 256 )
+		window:SetSize( 1024, 512 )
 		window:ShowCloseButton( false )
+		window:SetSizable( true )
+		window:SetMinWidth( 256 )
+		window:SetMinHeight( 128 )
 		window:SetTitle( "" )
 		window.title = "Command Prompt"
 		window.curDir = "personal_files"
@@ -37,26 +40,26 @@ datapad:AddApp({
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
-			surface.SetDrawColor( background_color )
-			surface.DrawRect( w * 0.0015, h * 0.072, w * 0.9985, h * 0.928 )
-			
 			surface.SetDrawColor( color_white )
-			surface.DrawRect( w * 0.0015, h * 0.003, w * 0.9985, h * 0.07 )
+			surface.DrawRect( 1, 1, w - 2, 30 )
+			
+			surface.SetDrawColor( background_color )
+			surface.DrawRect( 1, 31, w - 2, h - 32 )
 			
 			surface.SetFont( "DermaDefaultBold" )
 			surface.SetTextColor( color_black )
-			surface.SetTextPos( w * 0.05, h * 0.025 ) 
+			surface.SetTextPos( 50, 10 ) 
 			surface.DrawText( window.title )
 			
 			surface.SetDrawColor( color_white )
 			surface.SetMaterial( Material( "datapad/app_icons/command_prompt.png" ) )
-			surface.DrawTexturedRect( w * 0.01, h * 0.015, w * 0.03, h * 0.05 )
+			surface.DrawTexturedRect( 5, 0, 34, 34 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
 		cls:SetText( "" )
-		cls:SetPos( ScrW() * 0.3778, ScrH() * 0.001 )
-		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
+		cls:SetPos( 973, 1 )
+		cls:SetSize( 50, 30 )
 		cls.DoClick = function()
 			window:Close()
 		end
@@ -67,13 +70,13 @@ datapad:AddApp({
 			
 			draw.NoTexture()
 			surface.SetDrawColor(color_black)
-			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
-			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, 2, h * 0.5, -45 )
+			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, 2, h * 0.5, 45 )
 		end		
 		
 		local txt = vgui.Create( "DTextEntry", window )
-		txt:SetPos( 0, ScrH() * 0.029 )
-		txt:SetSize( ScrW() * 0.4, ScrH() * 0.37 )
+		txt:SetPos( 1, 31 )
+		txt:SetSize( 1022, 480 )
 		txt:SetVerticalScrollbarEnabled( true )
 		txt:SetPaintBackground( false )
 		txt:SetDrawLanguageID( false )
@@ -88,6 +91,11 @@ datapad:AddApp({
 		
 		txt.OnMousePressed = function( self, kc )
 			if kc == MOUSE_RIGHT then return true end
+		end
+		
+		window.OnSizeChanged = function( self, newW, newH )
+			cls:SetX( newW - 51 )
+			txt:SetSize( newW - 2, newH - 32 )
 		end
 		
 		local history = {}
