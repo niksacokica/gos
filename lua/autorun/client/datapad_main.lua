@@ -182,7 +182,6 @@ local function taskBar( background )
 		surface.SetMaterial( wifiMat )
 		surface.SetDrawColor( c:Unpack() )
 		surface.DrawTexturedRect( 0, 0, w*0.55, h )
-		return true
 	end
 	
 	local dateTime = vgui.Create( "DLabel", bar )
@@ -192,9 +191,9 @@ local function taskBar( background )
 	
 	dateTime.Paint = function( self, w, h )
 		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "HudDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
-		
-		return true
 	end
+	
+	PrintTable(bar:GetChildren())
 
 	hook.Run( "DatapadPostTaskBar" )
 end

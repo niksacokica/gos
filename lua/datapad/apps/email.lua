@@ -37,17 +37,108 @@ datapad:AddApp({
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
 		end
 		
+		local emails = vgui.Create( "DScrollPanel", window )
+		emails:SetPos( ScrW() * 0.01, ScrH() * 0.056 )
+		emails:SetSize( ScrW() * 0.48, ScrH() * 0.43 )
+		
+		local emailsbar = emails:GetVBar()
+		function emailsbar.btnUp:Paint( w, h )
+		end
+		function emailsbar.btnDown:Paint( w, h )
+		end
+		
+		local color_lightGray = Color( 200, 200, 200 )
+		function emailsbar.btnGrip:Paint( w, h )
+			draw.RoundedBox( 0, 0, 0, w, h, color_lightGray )
+		end
+		
+		local color_darkGray = Color( 150, 150, 150 )
+		function emailsbar:Paint( w, h )
+			draw.RoundedBox( 0, 0, h * 0.023, w, h * 0.954, color_darkGray )
+		end
+		
+		local emailText = "NEW EMAIL"
+		local newEmailPanels = {}
+		local function newEmail()
+			emailText = "SEND"
+			emails:Hide()
+		
+			local recipientLabel = vgui.Create( "DLabel", window )
+			recipientLabel:SetPos( ScrW() * 0.01, ScrH() * 0.06 )
+			recipientLabel:SetSize( 100, 30 )
+			recipientLabel:SetFont( "CloseCaption_Normal" )
+			recipientLabel:SetText( "Recipient" )
+		
+			local recipient = vgui.Create( "DTextEntry", window )
+			recipient:SetPos( 120, ScrH() * 0.062 )
+			recipient:SetSize( ScrW() * 0.443, ScrH() * 0.02 )
+			recipient:SetVerticalScrollbarEnabled( false )
+			recipient:SetDrawLanguageID( false )
+			recipient:SetMultiline( false )
+			recipient:SetFont( "CloseCaption_Normal" )
+			
+			local titleLabel = vgui.Create( "DLabel", window )
+			titleLabel:SetPos( ScrW() * 0.01, ScrH() * 0.1 )
+			titleLabel:SetSize( 100, 30 )
+			titleLabel:SetFont( "CloseCaption_Normal" )
+			titleLabel:SetText( "Title" )
+			
+			local title = vgui.Create( "DTextEntry", window )
+			title:SetPos( 120, ScrH() * 0.1 )
+			title:SetSize( ScrW() * 0.443, ScrH() * 0.02 )
+			title:SetVerticalScrollbarEnabled( false )
+			title:SetDrawLanguageID( false )
+			title:SetMultiline( false )
+			title:SetFont( "CloseCaption_Normal" )
+		
+			local body = vgui.Create( "DTextEntry", window )
+			body:SetPos( ScrW() * 0.01, ScrH() * 0.14 )
+			body:SetSize( ScrW() * 0.48, ScrH() * 0.343 )
+			body:SetVerticalScrollbarEnabled( true )
+			body:SetDrawLanguageID( false )
+			body:SetMultiline( true )
+			body:SetFont( "CloseCaption_Normal" )
+			
+			table.insert( newEmailPanels, recipientLabel )
+			table.insert( newEmailPanels, recipient )
+			table.insert( newEmailPanels, titleLabel )
+			table.insert( newEmailPanels, title )
+			table.insert( newEmailPanels, body )
+		end
+		
+		local function destroyNewEmail()
+			emailText = "NEW EMAIL"
+			emails:Show()
+			
+			if #newEmailPanels > 0 then
+				for k, v in ipairs( newEmailPanels ) do
+					v:Remove()
+				end
+				
+				table.Empty( newEmailPanels )
+			end
+		end
+		
+		local function sendEmail()
+		end
+		
 		local newButt = vgui.Create( "DButton", window )
 		newButt:SetText( "" )
 		newButt:SetPos( ScrW() * 0.42, ScrH() * 0.032 )
 		newButt:SetSize( 171, 30 )
 		newButt.inb = true
 		newButt.DoClick = function( self )
+			if emailText == "NEW EMAIL" then
+				newEmail()
+			else
+				sendEmail()
+				destroyNewEmail()
+			end
 		end
 		
 		newButt.Paint = function( self, w, h )
 			draw.RoundedBox( 25, 5, 0, w-5, h, color_gray )
-			draw.SimpleText( "NEW EMAIL", "DermaLarge", ScrW() * 0.034, ScrH() * 0.01, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+			draw.SimpleText( emailText, "DermaLarge", ScrW() * 0.034, ScrH() * 0.01, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		end
 		
 		local inboxButt = vgui.Create( "DButton", window )
@@ -56,6 +147,7 @@ datapad:AddApp({
 		inboxButt:SetSize( 121, 40 )
 		inboxButt.inb = true
 		inboxButt.DoClick = function( self )
+			destroyNewEmail()
 			self:MoveToFront()
 		end
 
@@ -63,7 +155,8 @@ datapad:AddApp({
 		sentButt:SetText( "" )
 		sentButt:SetPos( ScrW() * 0.05, ScrH() * 0.0285 )
 		sentButt:SetSize( 121, 40 )
-		sentButt.DoClick = function( self )		
+		sentButt.DoClick = function( self )
+			destroyNewEmail()
 			self:MoveToFront()
 		end
 		
