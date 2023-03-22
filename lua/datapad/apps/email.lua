@@ -57,6 +57,28 @@ datapad:AddApp({
 			draw.RoundedBox( 0, 0, h * 0.023, w, h * 0.954, color_darkGray )
 		end
 		
+		local function emailsFill( eType )
+			emails:Clear()
+			
+			for k, v in ipairs( datapad.Emails[eType] ) do
+				local email = emails:Add( "DButton" )
+				email:SetText( v["title"] )
+				email:Dock( TOP )
+				email:DockMargin( 0, 0, 0, 5 )
+				
+				email.DoClick = function( self )
+					net.Start( "datapad_email_get" )
+						net.WriteBool( false )
+						net.WriteString( v["id"] )
+					net.SendToServer()
+				end
+			end
+		end
+		
+		local function emailDetails( email )
+			PrintTable( email )
+		end
+		
 		local emailText = "NEW EMAIL"
 		local newEmailPanels = {}
 		local function newEmail()
@@ -155,6 +177,7 @@ datapad:AddApp({
 		inboxButt.inb = true
 		inboxButt.DoClick = function( self )
 			destroyNewEmail()
+			emailsFill( "in" )
 			self:MoveToFront()
 		end
 
@@ -164,6 +187,7 @@ datapad:AddApp({
 		sentButt:SetSize( 121, 40 )
 		sentButt.DoClick = function( self )
 			destroyNewEmail()
+			emailsFill( "out" )
 			self:MoveToFront()
 		end
 		
@@ -179,5 +203,19 @@ datapad:AddApp({
 		inboxButt.Paint = cardPaint
 		sentButt.Paint = cardPaint
 		inboxButt:DoClick()
+		
+		hook.Add( "DatapadEmailNewEmail", "DatapadEmailNew", function( eType )
+			local child = window:GetChildren()
+			
+			if eType == "in" and child[#child] == inboxButt then
+				inboxButt:DoClick()
+			elseif eType == "out" and child[#child] == sentButt then
+				sentButt:DoClick()
+			end
+		end )
+		
+		net.Receive( "datapad_email_details", function()
+			emailDetails( net.ReadTable() )
+		end )
 	end
 })
