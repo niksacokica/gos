@@ -96,43 +96,55 @@ datapad:AddApp({
 		end
 		
 		browser.OnRightClick = function( self, path, pnl )
-			local popUp = vgui.Create( "DFrame", window )
-			popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
-			popUp:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
-			popUp:SetTitle( "File Rename" )
-			popUp:MakePopup()
-			
-			popUp.Think = function( self )			
-				self:MoveToFront()
-			end
-			
-			local renText = vgui.Create( "DTextEntry", popUp )
-			renText:SetPos( ScrW() * 0.005, ScrH() * 0.022 )
-			renText:SetSize( ScrW() * 0.09, ScrH() * 0.04 )
-			renText:SetFont( "DermaLarge" )
-			renText:SetText( string.GetFileFromFilename( path ) )
-			
-			local cancel = vgui.Create( "DButton", popUp )
-			cancel:SetText( "CANCEL" )
-			cancel:SetPos( ScrW() * 0.005, ScrH() * 0.07 )
-			cancel:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
-			cancel.DoClick = function()
-				popUp:Close()
-			end
-			
-			local ren = vgui.Create( "DButton", popUp )
-			ren:SetText( "RENAME" )
-			ren:SetPos( ScrW() * 0.065, ScrH() * 0.07 )
-			ren:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
-			ren.DoClick = function()
-				if not file.Rename( path, string.GetPathFromFilename( path ) .. renText:GetText() ) then
-					warningPopUp( "The filename must end with one of the following: .txt, .dat, .json, .xml, .csv, .jpg, .jpeg, .png, .vtf, .vmt, .mp3, .wav, .ogg! Restricted symbols are: \" :" )
-				else
-					browser:Refresh()
+			local menu = vgui.Create( "DMenu", window )
+			menu:AddOption( "Open", function()
+				local window = vgui.Create( "DFrame" )
+				window:Center()
+				window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
+				window:SetParent( self.screen )
+				window:MakePopup()
+				Notepad( window, path )
+			end )
+			menu:AddOption( "Rename", function()
+				local popUp = vgui.Create( "DFrame", window )
+				popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
+				popUp:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
+				popUp:SetTitle( "File Rename" )
+				popUp:MakePopup()
+				
+				popUp.Think = function( self )			
+					self:MoveToFront()
 				end
 				
-				popUp:Close()
-			end
+				local renText = vgui.Create( "DTextEntry", popUp )
+				renText:SetPos( ScrW() * 0.005, ScrH() * 0.022 )
+				renText:SetSize( ScrW() * 0.09, ScrH() * 0.04 )
+				renText:SetFont( "DermaLarge" )
+				renText:SetText( string.GetFileFromFilename( path ) )
+				
+				local cancel = vgui.Create( "DButton", popUp )
+				cancel:SetText( "CANCEL" )
+				cancel:SetPos( ScrW() * 0.005, ScrH() * 0.07 )
+				cancel:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
+				cancel.DoClick = function()
+					popUp:Close()
+				end
+				
+				local ren = vgui.Create( "DButton", popUp )
+				ren:SetText( "RENAME" )
+				ren:SetPos( ScrW() * 0.065, ScrH() * 0.07 )
+				ren:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
+				ren.DoClick = function()
+					if not file.Rename( path, string.GetPathFromFilename( path ) .. renText:GetText() ) then
+						warningPopUp( "The filename must end with one of the following: .txt, .dat, .json, .xml, .csv, .jpg, .jpeg, .png, .vtf, .vmt, .mp3, .wav, .ogg! Restricted symbols are: \" :" )
+					else
+						browser:Refresh()
+					end
+					
+					popUp:Close()
+				end
+			end ) 
+			menu:Open()
 		end
 		
 		browser:Refresh()

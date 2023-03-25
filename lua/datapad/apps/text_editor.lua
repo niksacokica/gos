@@ -22,7 +22,7 @@ local function PopUp( window, path, text )
 	confirm:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
 	confirm.DoClick = function()
 		if path == "newfile" then
-			file.Write( "datapad/personal_files/desktop/" .. os.date( "%d-%m-%Y_%H-%M-%S" ) .. ".txt", text )
+			file.Write( "datapad/personal_files/documents/" .. os.date( "%d-%m-%Y_%H-%M-%S" ) .. ".txt", text )
 		else
 			file.Write( path, text )
 		end
@@ -38,6 +38,105 @@ local function PopUp( window, path, text )
 		popup:Close()
 		window:Close()
 		clicked = false
+	end
+end
+local function openpath(path, text)
+	text:SetText(file.Read( path ))
+end
+
+local function saveaspath(path, text)
+	local data = text:GetText()
+	file.Write( path, data)
+end
+
+local function SelectFile(pnl, type, text)
+	local window = vgui.Create( "DFrame", pnl )
+	window:Center()
+	window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
+	window:MakePopup()
+	window:SetPos( ScrW() * 0.3, ScrH() * 0.3 )
+	window:SetSize( ScrW() * 0.35, ScrH() * 0.359 )
+	window:ShowCloseButton( false )
+	window:SetTitle( "" )
+	
+	local back_clr = Color( 50, 50, 50 )
+	local color_gray = Color( 150, 150, 150 )
+	local color_red = Color( 255, 35, 35)
+	window.Paint = function( self, w, h )
+		surface.SetDrawColor( color_gray )
+		surface.DrawOutlinedRect( 0, 0, w, h, 1 )
+		
+		surface.SetDrawColor( color_white )
+		surface.DrawRect( w * 0.002, h * 0.002, w * 0.998, h )
+	end
+	
+	local cls = vgui.Create( "DButton", window )
+	cls:SetText( "" )
+	cls:SetPos( ScrW() * 0.328, ScrH() * 0.001 )
+	cls:SetSize( ScrW() * 0.022, ScrH() * 0.03 )
+	cls.DoClick = function()
+		window:Close()
+	end
+	
+	cls.Paint = function( self, w, h )
+		surface.SetDrawColor( cls:IsHovered() and color_red or color_white )
+		surface.DrawRect( 0, 0, w, h )
+		
+		draw.NoTexture()
+		surface.SetDrawColor( back_clr )
+		surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
+		surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+	end
+	
+    local fileBrowser = vgui.Create("DFileBrowser", window)
+	fileBrowser:SetPos( ScrW() * 0.0005, ScrH() * 0.029 )
+	fileBrowser:SetSize( ScrW() * 0.3495, ScrH() * 0.3 )
+	fileBrowser:Clear()
+	fileBrowser:SetPath( "DATA" )
+	fileBrowser:SetBaseFolder( "datapad/personal_files" )
+	fileBrowser:SetName( LocalPlayer():GetName() )
+	fileBrowser:SetOpen( true )
+	fileBrowser.OnDoubleClick = function(self, path, pnl)
+        print("Selected file:", path)
+    end
+
+	local saveBtn = vgui.Create("DButton", window)
+	saveBtn:SetPos( 560, 358)
+	saveBtn:SetSize(100, 25)
+
+	if type == "saveas" then
+		local filename = vgui.Create("DTextEntry", window)
+		filename:SetPos(10, 360)
+		filename:SetSize(window:GetWide() - 140, 20)
+		
+		saveBtn:SetText("Save")
+		saveBtn.DoClick = function()
+			local fileName = filename:GetValue()
+			local folder = fileBrowser:GetCurrentFolder()
+			if fileName ~= "" then
+				local path = folder .. "/" .. fileName
+				window:Close()
+				saveaspath(path, text)
+			else
+				error("File name cannot be empty")
+			end
+		end
+	elseif type == "open" then
+		local selpath
+
+		saveBtn:SetText("Open")
+
+		fileBrowser.OnSelect = function(self, path, pnl)
+			selpath = path
+		end
+		saveBtn.DoClick = function()
+			if path ~= "" then
+				window:Close()
+				openpath(selpath, text)
+			else
+				error("No file selected")
+			end
+		end
 	end
 end
 function Notepad( window, path )
@@ -90,10 +189,18 @@ function Notepad( window, path )
 	cls:SetText( "" )
 	cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
 	cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
+	local saved = false
+	cls.OnValueChange = function()
+		saved = false
+	end
 	cls.DoClick = function()
-		if clicked == false then
-			clicked = true
-			PopUp( window, path, text:GetText() )
+		if saved == false then
+			if clicked == false then
+				clicked = true
+				PopUp( window, path, text:GetText() )
+			end
+		else
+			window:Close()
 		end
 	end
 
@@ -124,15 +231,19 @@ function Notepad( window, path )
 			datapad:StartApp( datapad.apps["notepad"] )
 		end )
 		menu:AddOption( "Open...", function()
-		end ) 
+			SelectFile(window, "open", text)
+		end )
 		menu:AddOption( "Save", function()
+			saved = true
 			if path == "newfile" then
-				file.Write( "data/datapad/notepad/" .. os.date( "%d-%m-%Y_%H-%M-%S" ) .. ".txt", text:GetText() )
+				file.Write( "datapad/personal_files/documents/" .. os.date( "%d-%m-%Y_%H-%M-%S" ) .. ".txt", text:GetText() )
 			else
 				file.Write( path, text:GetText() )
 			end
 		end )
 		menu:AddOption( "Save As...", function()
+			saved = true
+			SelectFile(window, "saveas", text)
 		end )
 		menu:AddOption( "Exit", function()
 			window:Close()
@@ -146,7 +257,7 @@ datapad:AddApp({
 	["name"] = "Notepad",
 	["icon"] = "datapad/app_icons/text_editor.png",
 	["creator"] = "TheWander02",
-	["window"] = function( window )
+	["window"] = function( window, args )
 		Notepad( window, "newfile" )
 	end
 })
