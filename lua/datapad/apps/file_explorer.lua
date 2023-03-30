@@ -20,7 +20,6 @@ datapad:AddApp({
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetText( "" )
 		cls:SetPos( ScrW() * 0.328, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
@@ -35,6 +34,8 @@ datapad:AddApp({
 			surface.SetDrawColor( color_white )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+			
+			return true
 		end
 		
 		local browser = vgui.Create( "DFileBrowser", window )
@@ -151,7 +152,6 @@ datapad:AddApp({
 		
 		local function addIcon( posX, posY, sizeX, sizeY, iconPath, func )
 			local icon = vgui.Create( "DButton", window )
-			icon:SetText( "" )
 			icon:SetPos( posX, posY )
 			icon:SetSize( sizeX, sizeY )
 			icon.DoClick = func
@@ -163,6 +163,8 @@ datapad:AddApp({
 				surface.SetMaterial( iconMat )
 				surface.SetDrawColor( 255, 255, 255, 255 )
 				surface.DrawTexturedRect( 0, 0, w, h )
+				
+				return true
 			end
 		end
 		

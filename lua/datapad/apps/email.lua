@@ -20,7 +20,6 @@ datapad:AddApp({
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetText( "" )
 		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
@@ -35,6 +34,8 @@ datapad:AddApp({
 			surface.SetDrawColor( color_white )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+			
+			return true
 		end
 		
 		local emails = vgui.Create( "DScrollPanel", window )
@@ -42,10 +43,8 @@ datapad:AddApp({
 		emails:SetSize( ScrW() * 0.48, ScrH() * 0.43 )
 		
 		local emailsbar = emails:GetVBar()
-		function emailsbar.btnUp:Paint( w, h )
-		end
-		function emailsbar.btnDown:Paint( w, h )
-		end
+		emailsbar.btnUp.Paint = nil
+		emailsbar.btnDown.Paint = nil
 		
 		local color_lightGray = Color( 200, 200, 200 )
 		function emailsbar.btnGrip:Paint( w, h )
@@ -152,7 +151,6 @@ datapad:AddApp({
 		end
 		
 		local newButt = vgui.Create( "DButton", window )
-		newButt:SetText( "" )
 		newButt:SetPos( ScrW() * 0.42, ScrH() * 0.032 )
 		newButt:SetSize( 171, 30 )
 		newButt.inb = true
@@ -168,10 +166,11 @@ datapad:AddApp({
 		newButt.Paint = function( self, w, h )
 			draw.RoundedBox( 25, 5, 0, w-5, h, color_gray )
 			draw.SimpleText( emailText, "DermaLarge", ScrW() * 0.034, ScrH() * 0.01, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		
+			return true
 		end
 		
 		local inboxButt = vgui.Create( "DButton", window )
-		inboxButt:SetText( "" )
 		inboxButt:SetPos( ScrW() * 0.01, ScrH() * 0.0285 )
 		inboxButt:SetSize( 121, 40 )
 		inboxButt.inb = true
@@ -182,7 +181,6 @@ datapad:AddApp({
 		end
 
 		local sentButt = vgui.Create( "DButton", window )
-		sentButt:SetText( "" )
 		sentButt:SetPos( ScrW() * 0.05, ScrH() * 0.0285 )
 		sentButt:SetSize( 121, 40 )
 		sentButt.DoClick = function( self )
@@ -198,6 +196,8 @@ datapad:AddApp({
 		
 			draw.RoundedBoxEx( 50, 0, 0, w, h, ( child[#child] == self and btn_selected or btn_unselected ), true, true )
 			draw.SimpleText( self.inb and "Inbox" or "Sent", "DermaLarge", ScrW() * 0.023, ScrH() * 0.013, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		
+			return true
 		end
 		
 		inboxButt.Paint = cardPaint
@@ -214,8 +214,9 @@ datapad:AddApp({
 			end
 		end )
 		
-		net.Receive( "datapad_email_details", function()
-			emailDetails( net.ReadTable() )
+		net.Receive( "datapad_email_details", function( len )
+			local data = net.ReadData( len / 8 )
+			emailDetails( util.JSONToTable( util.Decompress( data ) ) )
 		end )
 	end
 })

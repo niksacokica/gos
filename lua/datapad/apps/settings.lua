@@ -28,7 +28,6 @@ datapad:AddApp({
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetText( "" )
 		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
@@ -43,6 +42,8 @@ datapad:AddApp({
 			surface.SetDrawColor( color_white )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+			
+			return true
 		end
 		
 		local cats = vgui.Create( "DScrollPanel", window )
@@ -50,10 +51,8 @@ datapad:AddApp({
 		cats:SetSize( ScrW() * 0.1, ScrH() * 0.454 )
 		
 		local cSbar = cats:GetVBar()
-		function cSbar.btnUp:Paint( w, h )
-		end
-		function cSbar.btnDown:Paint( w, h )
-		end
+		cSbar.btnUp.Paint = nil
+		cSbar.btnDown.Paint = nil
 		function cSbar.btnGrip:Paint( w, h )
 			draw.RoundedBox( 10, 0, 0, w, h, color_black )
 		end
@@ -68,10 +67,8 @@ datapad:AddApp({
 		sCats:SetSize( ScrW() * 0.342, ScrH() * 0.454 )
 		
 		local scSbar = sCats:GetVBar()
-		function scSbar.btnUp:Paint( w, h )
-		end
-		function scSbar.btnDown:Paint( w, h )
-		end
+		scSbar.btnUp.Paint = nil
+		scSbar.btnDown.Paint = nil
 		function scSbar.btnGrip:Paint( w, h )
 			draw.RoundedBox( 10, 0, 0, w, h, color_black )
 		end
@@ -85,7 +82,6 @@ datapad:AddApp({
 		local selected = ""
 		for cn, c in SortedPairs( datapad.settings ) do
 			local cat = cats:Add( "DButton" )
-			cat:SetText( "" )
 			cat:Dock( TOP )
 			cat:DockMargin( 0, 0, 0, 5 )
 			cat:SetSize( ScrW() * 0.1, ScrH() * 0.033 )
@@ -99,6 +95,8 @@ datapad:AddApp({
 					surface.SetDrawColor( color_black )
 					surface.DrawLine( w * 0.04, h * 0.98, w * 0.96, h * 0.98 )
 				end
+				
+				return true
 			end
 			
 			cat.DoClick = function()
@@ -107,7 +105,6 @@ datapad:AddApp({
 			
 				for scn, sc in SortedPairs( c ) do
 					local sCat = sCats:Add( "DLabel" )
-					sCat:SetText( "" )
 					sCat:Dock( TOP )
 					sCat:DockMargin( 0, 50, 0, 0 )
 					sCat:SetHeight( ScrH() * 0.03 )
@@ -119,6 +116,8 @@ datapad:AddApp({
 						
 						surface.SetDrawColor( color_white )
 						surface.DrawLine( 0, h * 0.98, w * 0.96, h * 0.98 )
+						
+						return true
 					end
 					
 					for sn, s in SortedPairs( sc ) do
@@ -128,20 +127,17 @@ datapad:AddApp({
 						sBack:Dock( TOP )
 						sBack:DockMargin( 0, 10, 0, 0 )
 						sBack:SetHeight( ScrH() * sHeight )
-						sBack.Paint = function( self, w, h )
-						end
+						sBack.Paint = nil
 						
 						local sLeft = vgui.Create( "DPanel", sBack )
 						sLeft:Dock( LEFT )
 						sLeft:SetWidth( ScrW() * sWidth )
-						sLeft.Paint = function( self, w, h )
-						end
+						sLeft.Paint = nil
 						
 						local sRight = vgui.Create( "DPanel", sBack )
 						sRight:Dock( RIGHT )
 						sRight:DockMargin( sPan:GetDockMargin() )
-						sRight.Paint = function( self, w, h )
-						end
+						sRight.Paint = nil
 						
 						if sPan then
 							sPan:SetParent( sRight )

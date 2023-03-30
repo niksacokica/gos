@@ -33,7 +33,6 @@ datapad:AddApp({
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetText( "" )
 		cls:SetPos( ScrW() * 0.1447, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.025, ScrH() * 0.03 )
 		cls.DoClick = function()
@@ -49,6 +48,8 @@ datapad:AddApp({
 			surface.SetDrawColor( color_black )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.04, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.04, h * 0.5, 45 )
+			
+			return true
 		end
 		
 		local nums = vgui.Create( "DLabel", window )

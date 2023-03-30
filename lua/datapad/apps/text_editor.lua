@@ -71,7 +71,6 @@ local function SelectFile(pnl, type, text)
 	end
 	
 	local cls = vgui.Create( "DButton", window )
-	cls:SetText( "" )
 	cls:SetPos( ScrW() * 0.328, ScrH() * 0.001 )
 	cls:SetSize( ScrW() * 0.022, ScrH() * 0.03 )
 	cls.DoClick = function()
@@ -86,6 +85,8 @@ local function SelectFile(pnl, type, text)
 		surface.SetDrawColor( back_clr )
 		surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 		surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+		
+		return true
 	end
 	
     local fileBrowser = vgui.Create("DFileBrowser", window)
@@ -186,7 +187,6 @@ function Notepad( window, path )
 	end
 
 	local cls = vgui.Create( "DButton", window )
-	cls:SetText( "" )
 	cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
 	cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 	local saved = false
@@ -212,6 +212,8 @@ function Notepad( window, path )
 		surface.SetDrawColor(color_black)
 		surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 		surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+		
+		return true
 	end
 
 	local grid = vgui.Create( "DGrid", window )

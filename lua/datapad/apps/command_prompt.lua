@@ -57,7 +57,6 @@ datapad:AddApp({
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetText( "" )
 		cls:SetPos( 973, 1 )
 		cls:SetSize( 50, 30 )
 		cls.DoClick = function()
@@ -72,6 +71,8 @@ datapad:AddApp({
 			surface.SetDrawColor(color_black)
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, 2, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, 2, h * 0.5, 45 )
+			
+			return true
 		end		
 		
 		local txt = vgui.Create( "DTextEntry", window )

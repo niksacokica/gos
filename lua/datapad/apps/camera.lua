@@ -33,7 +33,6 @@ datapad:AddApp({
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetText( "" )
 		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
@@ -48,33 +47,32 @@ datapad:AddApp({
 			surface.SetDrawColor( color_white )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, -45 )
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
+			
+			return true
 		end
 		
-		local pic = false
 		local photo = vgui.Create( "DButton", window )
-		photo:SetText( "" )
 		photo:SetPos( ScrW() * 0.424, ScrH() * 0.2 )
 		photo:SetSize( ScrH() * 0.1, ScrH() * 0.1 )
 		photo.DoClick = function()
 			LocalPlayer():DrawViewModel( false )
 			window:GetParent():Hide()
 			
-			pic = true
-			
 			LocalPlayer():ConCommand( "jpeg" )
 			
+			hook.Add( "HUDShouldDraw", "CamNoHUD", function()
+				return false
+			end )
+			
 			timer.Simple( 1, function()
-				pic = false
+				hook.Remove( "HUDShouldDraw", "CamNoHUD" )
+			
 				window:GetParent():Show()
 				LocalPlayer():DrawViewModel( true )
 			end )
+			
+			return true
 		end
-		
-		hook.Add( "HUDShouldDraw", "CamNoHUD", function()
-			if pic then
-				return false
-			end
-		end )
 		
 		local plyAngles = LocalPlayer():LocalEyeAngles()
 		hook.Add( "CreateMove", "CamFreeze", function( cmd )

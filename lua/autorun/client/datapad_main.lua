@@ -70,7 +70,6 @@ local function populateApps( grid )
 
 	for k, v in SortedPairs( datapad.apps ) do
 		local app = vgui.Create( "DButton" )
-		app:SetText( "" )
 		app:SetSize( grid:GetColWide()*0.8, grid:GetRowHeight()*0.8 )
 		app.DoDoubleClick = function()
 			datapad:StartApp( v )
@@ -81,6 +80,8 @@ local function populateApps( grid )
 			surface.SetDrawColor( color_white )
 			surface.SetMaterial( app_icon )
 			surface.DrawTexturedRect( 0, 0, w, h )
+			
+			return true
 		end
 		
 		if #grid:GetItems() < 50 then
@@ -103,7 +104,6 @@ local function taskBar( background )
 	bar:SetPopupStayAtBack( true )
 	
 	local icon = vgui.Create( "DButton", bar )
-	icon:SetText( "" )
 	icon:SetPos( 2, 2 )
 	icon:SetSize( 45, 45 )
 	icon.DoClick = function()
@@ -117,6 +117,8 @@ local function taskBar( background )
 		surface.SetMaterial( iconMat )
 		surface.SetDrawColor( 255, 255, 255, 255 )
 		surface.DrawTexturedRect( 0, 0, w, h )
+		
+		return true
 	end
 	
 	local openApps = vgui.Create( "DGrid", bar )
@@ -133,7 +135,6 @@ local function taskBar( background )
 	
 		for k, v in ipairs( datapad.OpenApps ) do		
 			local openApp = vgui.Create( "DButton" )
-			openApp:SetText( "" )
 			openApp:SetColor( color_black )
 			openApp:SetSize( 40, 40 )
 			
@@ -152,6 +153,8 @@ local function taskBar( background )
 				surface.SetMaterial( ico )
 				surface.SetDrawColor( 255, 255, 255, 255 )
 				surface.DrawTexturedRect( 1, 1, w - 1, h - 1 )
+				
+				return true
 			end
 			
 			openApp.DoClick = function()
@@ -167,7 +170,6 @@ local function taskBar( background )
 	hook.Add( "DatapadAppClosed", "DatapadRemoveAppFromTaskBar", fillTaskBar )
 	
 	local ping = vgui.Create( "DLabel", bar )
-	ping:SetText( "" )
 	ping:SetPos( ScrW() - 222, 0 )
 	ping:SetSize( 90, 50 )
 	
@@ -182,15 +184,18 @@ local function taskBar( background )
 		surface.SetMaterial( wifiMat )
 		surface.SetDrawColor( c:Unpack() )
 		surface.DrawTexturedRect( 0, 0, w*0.55, h )
+		
+		return true
 	end
 	
 	local dateTime = vgui.Create( "DLabel", bar )
-	dateTime:SetText( "" )
 	dateTime:SetPos( ScrW() - 131, 3 )
 	dateTime:SetSize( 125, 100 )
 	
 	dateTime.Paint = function( self, w, h )
 		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "HudDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
+		
+		return true
 	end
 
 	hook.Run( "DatapadPostTaskBar" )

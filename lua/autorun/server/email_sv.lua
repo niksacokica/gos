@@ -23,7 +23,11 @@ net.Receive( "datapad_email_get", function( len, ply )
 				for k, v in ipairs( files ) do
 					local email = util.JSONToTable( file.Read( path .. "/" .. v, "DATA" ) )
 				
-					table.insert( ( email["type"] == "out" ) and emails["out"] or emails["in"], { ["title"] = email["title"], ["id"] = v } )
+					if email then
+						table.insert( ( email["type"] == "out" ) and emails["out"] or emails["in"], { ["title"] = email["title"], ["id"] = v } )
+					else
+						print( v .. " is corrupted!" )
+					end
 				end
 			end
 			
@@ -31,14 +35,15 @@ net.Receive( "datapad_email_get", function( len, ply )
 		net.Send( ply )
 	else
 		net.Start( "datapad_email_details" )
-			local email = {}
+			local email
 			
 			local path = "datapad/emails/" .. ply:SteamID64() .. "/" .. net.ReadString()
 			if file.Exists( path, "DATA" ) then
-				email = util.JSONToTable( file.Read( path, "DATA" ) )
+				email = file.Read( path, "DATA" )
 			end
 			
-			net.WriteTable( email )
+			local sendData = util.Compress( email )
+			net.WriteData( sendData, #sendData )
 		net.Send( ply )
 	end
 end )
