@@ -16,11 +16,11 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.002, h * 0.002, w * 0.998, h * 0.08 )
+			surface.DrawRect( 1, 1, w - 2, h - 2 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.328, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.328, 1 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()
@@ -71,9 +71,9 @@ datapad:AddApp({
 		end
 		
 		local function warningPopUp( text )
-			local warning = vgui.Create( "DFrame", window )
+			local warning = datapad:CreatePopUp( window )
 			warning:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
-			warning:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
+			warning:SetSize( 300, 150 )
 			warning:SetTitle( "WARNING" )
 			warning:MakePopup()
 			
@@ -82,61 +82,41 @@ datapad:AddApp({
 			end
 
 			local warningText = vgui.Create( "DLabel", warning )
-			warningText:SetPos( ScrW() * 0.005, ScrH() * 0.022 )
-			warningText:SetSize( ScrW() * 0.09, ScrH() * 0.04 )
+			warningText:SetPos( 10, 25 )
+			warningText:SetSize( 280, 70 )
 			warningText:SetWrap( true )
 			warningText:SetText( text )
 			
 			local okWarning = vgui.Create( "DButton", warning )
 			okWarning:SetText( "OK" )
-			okWarning:SetPos( ScrW() * 0.035, ScrH() * 0.07 )
-			okWarning:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
+			okWarning:SetPos( 115, 100 )
+			okWarning:SetSize( 70, 35 )
 			okWarning.DoClick = function()
 				warning:Close()
 			end
 		end
 		
-		browser.OnRightClick = function( self, path, pnl )
-			local menu = vgui.Create( "DMenu", window )
-			menu:AddOption( "Open", function()
-				local window = vgui.Create( "DFrame" )
-				window:Center()
-				window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
-				window:SetParent( self.screen )
-				window:MakePopup()
-				Notepad( window, path )
-			end )
-			menu:AddOption( "Rename", function()
-				local popUp = vgui.Create( "DFrame", window )
-				popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
-				popUp:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
-				popUp:SetTitle( "File Rename" )
-				popUp:MakePopup()
-				
-				popUp.Think = function( self )			
-					self:MoveToFront()
-				end
-				
-				local renText = vgui.Create( "DTextEntry", popUp )
-				renText:SetPos( ScrW() * 0.005, ScrH() * 0.022 )
-				renText:SetSize( ScrW() * 0.09, ScrH() * 0.04 )
-				renText:SetFont( "DermaLarge" )
-				renText:SetText( string.GetFileFromFilename( path ) )
-				
-				local cancel = vgui.Create( "DButton", popUp )
-				cancel:SetText( "CANCEL" )
-				cancel:SetPos( ScrW() * 0.005, ScrH() * 0.07 )
-				cancel:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
-				cancel.DoClick = function()
-					popUp:Close()
-				end
-				
+		local function addPopUp( curPath, title, rnm, folder )
+			local popUp = datapad:CreatePopUp( window )
+			popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
+			popUp:SetSize( 300, 150 )
+			popUp:SetTitle( title )
+			popUp:MakePopup()
+
+			local name = vgui.Create( "DTextEntry", popUp )
+			name:SetPos( 10, 40 )
+			name:SetSize( 280, 35 )
+			name:SetFont( "DermaLarge" )
+			
+			if rnm then
+				name:SetText( string.GetFileFromFilename( rnm ) )
+			
 				local ren = vgui.Create( "DButton", popUp )
 				ren:SetText( "RENAME" )
-				ren:SetPos( ScrW() * 0.065, ScrH() * 0.07 )
-				ren:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
+				ren:SetPos( 115, 100 )
+				ren:SetSize( 70, 30 )
 				ren.DoClick = function()
-					if not file.Rename( path, string.GetPathFromFilename( path ) .. renText:GetText() ) then
+					if not file.Rename( rnm, string.GetPathFromFilename( rnm ) .. name:GetText() ) then
 						warningPopUp( "The filename must end with one of the following: .txt, .dat, .json, .xml, .csv, .jpg, .jpeg, .png, .vtf, .vmt, .mp3, .wav, .ogg! Restricted symbols are: \" :" )
 					else
 						browser:Refresh()
@@ -144,7 +124,58 @@ datapad:AddApp({
 					
 					popUp:Close()
 				end
+			else
+				local cancel = vgui.Create( "DButton", popUp )
+				cancel:SetText( "CANCEL" )
+				cancel:SetPos( 20, 100 )
+				cancel:SetSize( 75, 30 )
+				cancel.DoClick = function()
+					popUp:Close()
+				end
+				
+				local add = vgui.Create( "DButton", popUp )
+				add:SetText( "ADD" )
+				add:SetPos( 205, 100 )
+				add:SetSize( 75, 30 )
+				add.DoClick = function()			
+					if #name:GetText() == 0 then
+						warningPopUp( folder and "Folder name is empty!" or "File name is empty!" )
+					elseif file.Exists( curPath .. "/" .. name:GetText(), "DATA" ) then
+						warningPopUp( folder and "Folder already exists!" or "File already exists!" )
+					else
+						if folder then
+							file.CreateDir( curPath .. "/" .. name:GetText() )
+						else
+							file.Write( curPath .. "/" .. name:GetText(), "" )
+							
+							if not file.Exists( curPath .. "/" .. name:GetText(), "DATA" ) then
+								warningPopUp( "The filename must end with one of the following: .txt, .dat, .json, .xml, .csv, .jpg, .jpeg, .png, .vtf, .vmt, .mp3, .wav, .ogg! Restricted symbols are: \" :" )
+							end
+						end
+						
+						browser:Refresh()
+					end
+					
+					popUp:Close()
+				end
+			end
+		end
+		
+		browser.OnRightClick = function( self, path, pnl )
+			local menu = vgui.Create( "DMenu", window )
+			
+			menu:AddOption( "Open", function()
+				--[[local window = vgui.Create( "DFrame" )
+				window:Center()
+				window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
+				window:SetParent( self.screen )
+				window:MakePopup()
+				Notepad( window, path )]]
+			end )
+			menu:AddOption( "Rename", function()
+				addPopUp( nil, "File Rename", path )
 			end ) 
+			
 			menu:Open()
 		end
 		
@@ -173,66 +204,19 @@ datapad:AddApp({
 			browser:Refresh()
 		end )
 		
-		local function addPopUp( curPath, title, folder )
-			local popUp = vgui.Create( "DFrame", window )
-			popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
-			popUp:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
-			popUp:SetTitle( title )
-			popUp:MakePopup()
-
-			local name = vgui.Create( "DTextEntry", popUp )
-			name:SetPos( ScrW() * 0.002, ScrH() * 0.022 )
-			name:SetSize( ScrW() * 0.096, ScrH() * 0.025 )
-			name:SetFont( "DermaLarge" )
-			
-			local cancel = vgui.Create( "DButton", popUp )
-			cancel:SetText( "CANCEL" )
-			cancel:SetPos( ScrW() * 0.005, ScrH() * 0.066 )
-			cancel:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
-			cancel.DoClick = function()
-				popUp:Close()
-			end
-			
-			local add = vgui.Create( "DButton", popUp )
-			add:SetText( "ADD" )
-			add:SetPos( ScrW() * 0.065, ScrH() * 0.066 )
-			add:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
-			add.DoClick = function()			
-				if #name:GetText() == 0 then
-					warningPopUp( folder and "Folder name is empty!" or "File name is empty!" )
-				elseif file.Exists( curPath .. "/" .. name:GetText(), "DATA" ) then
-					warningPopUp( folder and "Folder already exists!" or "File already exists!" )
-				else
-					if folder then
-						file.CreateDir( curPath .. "/" .. name:GetText() )
-					else
-						file.Write( curPath .. "/" .. name:GetText(), "" )
-						
-						if not file.Exists( curPath .. "/" .. name:GetText(), "DATA" ) then
-							warningPopUp( "The filename must end with one of the following: .txt, .dat, .json, .xml, .csv, .jpg, .jpeg, .png, .vtf, .vmt, .mp3, .wav, .ogg! Restricted symbols are: \" :" )
-						end
-					end
-					
-					browser:Refresh()
-				end
-				
-				popUp:Close()
-			end
-		end
-		
 		addIcon( ScrW() * 0.02, ScrH() * 0.005, ScrH() * 0.02, ScrH() * 0.02, "icon16/folder_add.png",
 		function()
 			local curPath = browser:GetCurrentFolder()
 		
 			if curPath then
-				addPopUp( curPath, "New Folder", true )
+				addPopUp( curPath, "New Folder", false, true )
 			end
 		end )
 		
 		local function delPopUp( curPath, title, folder )
-			local popUp = vgui.Create( "DFrame", window )
+			local popUp = datapad:CreatePopUp( window )
 			popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
-			popUp:SetSize( ScrW() * 0.1, ScrH() * 0.1 )
+			popUp:SetSize( 300, 150 )
 			popUp:SetTitle( title )
 			popUp:MakePopup()
 			
@@ -241,15 +225,15 @@ datapad:AddApp({
 			end
 			
 			local delText = vgui.Create( "DLabel", popUp )
-			delText:SetPos( ScrW() * 0.005, ScrH() * 0.022 )
-			delText:SetSize( ScrW() * 0.09, ScrH() * 0.04 )
+			delText:SetPos( 10, 25 )
+			delText:SetSize( 280, 50 )
 			delText:SetWrap( true )
 			delText:SetText( "Are you sure you want to delete \"" .. curPath .. "\" and all of its contents?" )
 			
 			local cancel = vgui.Create( "DButton", popUp )
 			cancel:SetText( "CANCEL" )
-			cancel:SetPos( ScrW() * 0.005, ScrH() * 0.066 )
-			cancel:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
+			cancel:SetPos( 20, 100 )
+			cancel:SetSize( 75, 30 )
 			cancel.DoClick = function()
 				popUp:Close()
 			end
@@ -269,8 +253,8 @@ datapad:AddApp({
 			
 			local del = vgui.Create( "DButton", popUp )
 			del:SetText( "DELETE" )
-			del:SetPos( ScrW() * 0.065, ScrH() * 0.066 )
-			del:SetSize( ScrW() * 0.03, ScrH() * 0.02 )
+			del:SetPos( 205, 100 )
+			del:SetSize( 75, 30 )
 			del.DoClick = function()
 				delAll( curPath )
 				file.Delete( curPath )
@@ -294,7 +278,7 @@ datapad:AddApp({
 			local curPath = browser:GetCurrentFolder()
 		
 			if curPath then
-				addPopUp( curPath, "New File", false )
+				addPopUp( curPath, "New File", false, false )
 			end
 		end )
 		
@@ -311,6 +295,9 @@ datapad:AddApp({
 		searchEntry:SetPos( ScrW() * 0.1, ScrH() * 0.007 )
 		searchEntry:SetSize( ScrW() * 0.1, ScrH() * 0.017 )
 		searchEntry:SetFont( "DermaDefault" )
+		searchEntry.OnEnter = function( self, value )
+			browser:SetSearch( value )
+		end
 		
 		addIcon( ScrW() * 0.203, ScrH() * 0.006, ScrH() * 0.02, ScrH() * 0.02, "icon16/magnifier.png",
 		function()

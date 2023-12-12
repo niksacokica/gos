@@ -29,11 +29,11 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( darkMode and dark_back or light_back )
-			surface.DrawRect( w * 0.004, h * 0.002, w * 0.996, h * 0.998 )
+			surface.DrawRect( 1, 1, w - 2, h - 2 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.1447, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.1446, 1 )
 		cls:SetSize( ScrW() * 0.025, ScrH() * 0.03 )
 		cls.DoClick = function()
 			window:Close()
@@ -57,7 +57,7 @@ datapad:AddApp({
 		nums:SetText( "0" )
 		nums:SetFont( "NumberFont" )
 		nums:SetTextColor( color_black )
-		nums:SetSize( ScrW() * 0.165, ScrH() * 0.04 )
+		nums:SetSize( ScrW() * 0.165, ScrH() * 0.055 )
 		nums:SetContentAlignment( 6 )
 		
 		local calc = {
@@ -68,6 +68,7 @@ datapad:AddApp({
 			res = 0,
 			tmp = nil,
 			action = "",
+			pot=math.floor(ScrW()/213),
 			
 			["+"] = function( value, res )
 				return value + res
@@ -85,13 +86,13 @@ datapad:AddApp({
 				return res / value
 			end,
 			
-			UpdateDisplay = function( self )
+			UpdateDisplay = function( self )			
 				if self.value >= 10 ^ 99 or self.value <= -10 ^ 99 then
-					nums:SetText( string.Comma( string.format( "%.3e", self.value ) ) )
-				elseif self.value >= 10 ^ 9 or self.value <= -10 ^ 9 then
-					nums:SetText( string.Comma( string.format( "%.4e", self.value ) ) )
+					nums:SetText( string.Comma( string.format( "%." .. ( self.pot > 6 and self.pot-6 or "" ) .. "e", self.value ) ) )
+				elseif self.value >= 10 ^ self.pot or self.value <= -10 ^ self.pot then
+					nums:SetText( string.Comma( string.format( "%." .. ( self.pot > 5 and self.pot-5 or "" ) .. "e", self.value ) ) )
 				else
-					nums:SetText( string.Comma( self.decimals > 0 and string.format( "%.9g", self.value ) or self.value ) .. ( ( self.decimal and self.decimals == 0 ) and "." or "" ) )
+					nums:SetText( string.Comma( self.decimals > 0 and string.format( "%." .. self.pot .. "g", self.value ) or self.value ) .. ( ( self.decimal and self.decimals == 0 ) and "." or "" ) )
 				end
 			end,
 			
@@ -111,7 +112,7 @@ datapad:AddApp({
 				end
 				
 				self.tmp = self.value
-				self:UpdateDisplay( self )
+				self:UpdateDisplay()
 			end,
 			
 			AddDecimal = function( self )
@@ -126,6 +127,10 @@ datapad:AddApp({
 			end,
 			
 			ChangeSign = function( self )
+				if not self.value then 
+					self.value = self.res
+				end
+			
 				self.value = self.value * -1
 				
 				self:UpdateDisplay()
@@ -159,7 +164,9 @@ datapad:AddApp({
 			end,
 			
 			Pow = function( self )
-				if not self.value then return end
+				if not self.value then 
+					self.value = self.res
+				end
 			
 				self.value = self.value * self.value
 				self.tmp = self.value
@@ -169,7 +176,9 @@ datapad:AddApp({
 			end,
 			
 			Sqrt = function( self )
-				if not self.value then return end
+				if not self.value then 
+					self.value = self.res
+				end
 			
 				self.value = math.sqrt( self.value )
 				self.tmp = self.value
@@ -179,7 +188,9 @@ datapad:AddApp({
 			end,
 			
 			Inv = function( self )
-				if not self.value then return end
+				if not self.value then 
+					self.value = self.res
+				end
 			
 				self.value = 1 / self.value
 				self.tmp = self.value
@@ -451,7 +462,6 @@ datapad:AddApp({
 			local hvrb = Color( 95, 185, 238 )
 			local pvrg = Color( 175, 175, 175 )
 			local pvrb = Color( 38, 166, 242 )
-			but.UpdateColours = function( self, skin ) end
 			but.Paint = function( self, w, h )
 				surface.SetDrawColor( ( but:IsDown() and ( k == "=" and pvrb or pvrg ) or ( but:IsHovered() and ( k== "=" and hvrb or hvrg ) or darkMode and v["dClr"] or v["clr"] ) ):Unpack() )
 				surface.DrawRect( 0, 0, w, h )

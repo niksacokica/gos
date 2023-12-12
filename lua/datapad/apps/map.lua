@@ -45,7 +45,8 @@ datapad:AddApp({
 		local npcMat = Material( "datapad/other/mark_npc.png" )
 		local drawNpcs = datapad:GetSetting( "mm_draw_npc", false )
 		local drawPlys = datapad:GetSetting( "mm_draw_ply", false )
-		window.Paint = function( self, w, h )
+		
+		window.Paint = function( self, w, h )		
 			surface.SetDrawColor( color_gray )
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			

@@ -16,7 +16,7 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.9985, h * 0.998 )
+			surface.DrawRect( 1, 1, w -2, h - 2 )
 			
 			local x, y = self:GetPos()
 			
@@ -26,14 +26,14 @@ datapad:AddApp({
 				angles = LocalPlayer():EyeAngles(),
 				fov = 75,
 				drawviewmodel = false,
-				x = x + ScrH() * 0.015, y = y + ScrH() * 0.029,
+				x = x + ScrH() * 0.015, y = y + ScrH() * 0.029 + 1,
 				w = w - ScrH() * 0.03, h = h - ScrH() * 0.045
 			} )
 			DisableClipping( old )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.478, 1 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()
@@ -83,30 +83,28 @@ datapad:AddApp({
 			end
 		end )
 		
+		local function drawCircle( x, y, radius, seg )
+			local cir = {}
+
+			table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+			for i = 0, seg do
+				local a = math.rad( ( i / seg ) * -360 )
+				table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+			end
+
+			local a = math.rad( 0 )
+			table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+
+			surface.DrawPoly( cir )
+		end
+		
 		photo.Paint = function( self, w, h )
 			draw.NoTexture()
 		
-			surface.SetDrawColor( 255, 255, 255, 150 )
-			surface.DrawCircleFilled( w * 0.5, h * 0.5, h * 0.5, 25 )
+			surface.SetDrawColor( 255, 255, 255, 200 )
+			drawCircle( w * 0.5, h * 0.5, h * 0.5, 25 )
 			
-			surface.SetDrawColor( 0, 0, 0, 255)
-			surface.DrawRect( w * 0.15, w * 0.3, w * 0.02, w * 0.4 )
-			surface.DrawRect( w * 0.84, w * 0.3, w * 0.02, w * 0.4 )
-			surface.DrawRect( w * 0.15, w * 0.7, w * 0.71, w * 0.02 )
-			
-			surface.DrawRect( w * 0.15, w * 0.3, w * 0.2, w * 0.02 )
-			surface.DrawRect( w * 0.65, w * 0.3, w * 0.2, w * 0.02 )
-			
-			surface.DrawRect( w * 0.33, w * 0.22, w * 0.02, w * 0.1 )
-			surface.DrawRect( w * 0.65, w * 0.22, w * 0.02, w * 0.1 )
-			surface.DrawRect( w * 0.33, w * 0.22, w * 0.35, w * 0.02 )
-			
-			surface.DrawCircleFilled( w * 0.5, h * 0.5, h * 0.15, 50 )
-			
-			surface.DrawCircleFilled( w * 0.75, h * 0.4, h * 0.03, 25 )
-			
-			surface.SetDrawColor( 255, 255, 255, 255 )
-			surface.DrawCircleFilled( w * 0.5, h * 0.5, h * 0.125, 50 )
+			return true
 		end
 	end
 })

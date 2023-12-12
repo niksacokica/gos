@@ -29,13 +29,11 @@ function datapad:StartApp( v )
 	local hookReturn = hook.Run( "DatapadPreAppStart", v )
 	if hookReturn or #self.OpenApps >= math.floor( ( ScrW() - 250 ) / 40 ) then return end
 
-	local window = vgui.Create( "DFrame" )
+	local window = vgui.Create( "DFrame", self.screen )
 	window:Center()
 	window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
-	window:SetParent( self.screen )
 	window:MakePopup()
 	
-	local ind = #self.OpenApps
 	local function handleWindowClose()
 		if window.OnDelete then
 			window:OnDelete()
@@ -45,7 +43,7 @@ function datapad:StartApp( v )
 			if val[2] == v["name"] and val[1] == window then
 				table.remove( self.OpenApps, key )
 				
-				hook.Run( "DatapadAppClosed" )
+				hook.Run( "DatapadAppClosed", v )
 				return
 			end
 		end
@@ -61,7 +59,45 @@ function datapad:StartApp( v )
 	table.insert( self.OpenApps, { window, v["name"], v["icon"] } )
 	v["window"]( window )
 	
-	hook.Run( "DatapadPostAppStart", v )
+	hook.Run( "DatapadPostAppStart", v, window )
+end
+
+function datapad:CreatePopUp( parent, name, icon )
+	local hookReturn = hook.Run( "DatapadPrePopUpStart", parent, name, icon )
+	if hookReturn or #self.OpenApps >= math.floor( ( ScrW() - 250 ) / 40 ) then return end
+	
+	local windowName = isstring( name ) and name or "Generic PopUp"
+	local windowIcon = isstring( icon ) and icon or "datapad/app_icons/default_popup.png"
+	
+	local window = vgui.Create( "DFrame", parent )
+	window.isPopUp = true
+	
+	local function handleWindowClose()
+		if window.OnDelete then
+			window:OnDelete()
+		end
+		
+		for key, val in ipairs( self.OpenApps ) do
+			if val[2] == windowName and val[1] == window then
+				table.remove( self.OpenApps, key )
+				
+				hook.Run( "DatapadPopUpClosed", parent, windowName, windowIcon )
+				return
+			end
+		end
+	end
+	
+	function window:OnClose()	
+		handleWindowClose()
+	end
+	function window:OnRemove()
+		handleWindowClose()
+	end
+	
+	table.insert( self.OpenApps, { window, windowName, windowIcon } )
+	
+	hook.Run( "DatapadPostPopUpStart", window, parent, windowName, windowIcon )
+	return window
 end
 
 local function populateApps( grid )
@@ -103,26 +139,27 @@ local function taskBar( background )
 	bar:MakePopup()
 	bar:SetPopupStayAtBack( true )
 	
-	local icon = vgui.Create( "DButton", bar )
-	icon:SetPos( 2, 2 )
-	icon:SetSize( 45, 45 )
-	icon.DoClick = function()
+	local cls = vgui.Create( "DButton", bar )
+	cls:Dock(LEFT)
+	cls:DockMargin(3, 3, 0, 3)
+	cls:SetSize( 45, 0 )
+	cls.DoClick = function()
 		background:Remove()
 	end
 	
-	local iconMat = Material( "icon16/stop.png" )
-	icon.Paint = function( self, w, h )
+	local iconMat = Material( "datapad/other/exit.png" )
+	cls.Paint = function( self, w, h )
 		draw.NoTexture()
 	
 		surface.SetMaterial( iconMat )
-		surface.SetDrawColor( 255, 255, 255, 255 )
 		surface.DrawTexturedRect( 0, 0, w, h )
 		
 		return true
 	end
 	
 	local openApps = vgui.Create( "DGrid", bar )
-	openApps:SetPos( 55, 5 )
+	openApps:Dock(FILL)
+	openApps:DockMargin( 5, 5, 5, 0 )
 	openApps:SetCols( math.floor( ( ScrW() - 250 ) / 40 ) )
 	openApps:SetColWide( 40 )
 	openApps:SetRowHeight( 40 )
@@ -143,7 +180,16 @@ local function taskBar( background )
 			local in_clr_sel = Color( 150, 150, 150 )
 			local ico = Material( v[3] )
 			openApp.Paint = function( self, w, h )
-				if v[1]:HasFocus() then
+				local childWithFocus = nil
+				for j, l in ipairs(v[1]:GetChildren()) do
+					if l:HasFocus() then
+						childWithFocus = l
+					
+						break
+					end
+				end
+			
+				if v[1]:HasFocus() or ( childWithFocus and not childWithFocus.isPopUp ) then
 					surface.SetDrawColor( out_clr:Unpack() )
 					surface.DrawOutlinedRect( 0, 0, w, h, 2 )
 				end
@@ -166,39 +212,60 @@ local function taskBar( background )
 	end
 	
 	hook.Add( "DatapadPostAppStart", "DatapadAddAppToTaskBar", fillTaskBar )
-	
 	hook.Add( "DatapadAppClosed", "DatapadRemoveAppFromTaskBar", fillTaskBar )
+	hook.Add( "DatapadPostPopUpStart", "DatapadAddPopUpToTaskBar", fillTaskBar )
+	hook.Add( "DatapadPopUpClosed", "DatapadRemovePopUpFromTaskBar", fillTaskBar )
+	
+	local dateTime = vgui.Create( "DLabel", bar )
+	dateTime:Dock(RIGHT)
+	dateTime:DockMargin( 0, (1440/ScrH())^2*2.5, 10, 0 )
+	dateTime:SetSize( 125, 0 )
+	
+	local curTime = os.date( "%H:%M\n%d.%m.%Y" )
+	local dtmr = CurTime() + 1
+	dateTime.Paint = function( self, w, h )
+		if dtmr < CurTime() then
+			curTime = os.date( "%H:%M\n%d.%m.%Y" )
+		
+			dtmr = CurTime() + 1
+		end
+	
+		draw.DrawText( curTime, "ChatFont", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
+		
+		return true
+	end
 	
 	local ping = vgui.Create( "DLabel", bar )
-	ping:SetPos( ScrW() - 222, 0 )
-	ping:SetSize( 90, 50 )
+	ping:Dock(RIGHT)
+	ping:DockMargin(0, 3, 10, 3)
+	ping:SetSize( 75, 0 )
 	
-	local wifiMat = Material( "icon16/bullet_feed.png" )
+	local wifiMat = Material( "datapad/other/ping.png" )
+	local ptmr = CurTime() + 1
+	local p = LocalPlayer():Ping()
+	local c = Color( math.min( 255, p ), math.max( 0, 255 - p ), 0, 255 )
 	ping.Paint = function( self, w, h )
-		local p = LocalPlayer():Ping()
-		local c = Color( math.min( 255, p ), math.max( 0, 255 - p ), 0, 255 )
+		if ptmr < CurTime() then
+			local tmpp = LocalPlayer():Ping()
+			if not ( p == tmpp ) then
+				p = tmpp
+				c = Color( math.min( 255, p ), math.max( 0, 255 - p ), 0, 255 )
+			end
+			
+			ptmr = CurTime() + 1
+		end
 		draw.DrawText( p, "DermaLarge", w*0.7, h*0.2, c, TEXT_ALIGN_CENTER )
 		
 		draw.NoTexture()
 	
 		surface.SetMaterial( wifiMat )
-		surface.SetDrawColor( c:Unpack() )
-		surface.DrawTexturedRect( 0, 0, w*0.55, h )
-		
-		return true
-	end
-	
-	local dateTime = vgui.Create( "DLabel", bar )
-	dateTime:SetPos( ScrW() - 131, 3 )
-	dateTime:SetSize( 125, 100 )
-	
-	dateTime.Paint = function( self, w, h )
-		draw.DrawText( os.date( "%H:%M\n%d.%m.%Y" ), "HudDefault", w*0.5, 0, color_black, TEXT_ALIGN_CENTER )
+		surface.SetDrawColor( color_black )
+		surface.DrawTexturedRect( 0, h*0.27, w*0.33, h*0.5 )
 		
 		return true
 	end
 
-	hook.Run( "DatapadPostTaskBar" )
+	hook.Run( "DatapadPostTaskBar", bar )
 end
 
 function datapad:createScreen()
@@ -235,7 +302,7 @@ function datapad:createScreen()
 	grid:SetColWide( ScrW() * 0.099 )
 	grid:SetRowHeight( ScrH() * 0.193 )	
 	
-	hook.Run( "DatapadPostScreenCreate" )
+	hook.Run( "DatapadPostScreenCreate", background )
 	
 	taskBar( background )
 	populateApps( grid )

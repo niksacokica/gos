@@ -9,7 +9,7 @@ datapad:AddCommand({
 		"/K                     Carries out the command specified by string but remains\n\n" ..
 		"Note that multiple commands separated by the '&&' are accepted for string.\n\n" ..
 		"If /C or /K is specified, then they must be at the end.",
-	["function"] = function( args, window )		
+	["function"] = function( args, window )
 		local qIsSet = false
 		local tIsSet = ""
 		local cIsSet = false
@@ -41,7 +41,7 @@ datapad:AddCommand({
 			end
 		end
 		
-		local newApp = datapad.startApp( datapad.apps["Command Prompt"] )
+		local newApp = datapad:startApp( datapad.apps["Command Prompt"] )
 		if qIsSet then
 			newApp.noDel = 0
 			newApp:SetEcho( false )
