@@ -258,7 +258,7 @@ end
 datapad:AddApp({
 	["name"] = "Notepad",
 	["icon"] = "datapad/app_icons/text_editor.png",
-	["creator"] = "TheWander02",
+	["creator"] = "niksacokica",
 	["window"] = function( window, args )
 		Notepad( window, "newfile" )
 	end

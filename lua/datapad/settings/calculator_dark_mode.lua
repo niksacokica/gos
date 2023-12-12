@@ -60,6 +60,6 @@ datapad:AddSetting({
 			datapad:SaveSetting( "cc_dark_mode", val )
 		end
 	
-		return 0.05, 0.1, toggle
+		return 0.07, 0.15, toggle
 	end
 })

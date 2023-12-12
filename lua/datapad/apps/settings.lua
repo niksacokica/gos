@@ -28,7 +28,7 @@ datapad:AddApp({
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.478, 1 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()
@@ -47,8 +47,8 @@ datapad:AddApp({
 		end
 		
 		local cats = vgui.Create( "DScrollPanel", window )
-		cats:SetPos( ScrW() * 0.01, ScrH() * 0.03 )
-		cats:SetSize( ScrW() * 0.1, ScrH() * 0.454 )
+		cats:SetPos( 5, ScrH() * 0.03 )
+		cats:SetSize( ScrW() * 0.135 - 5, ScrH() * 0.454 )
 		
 		local cSbar = cats:GetVBar()
 		cSbar.btnUp.Paint = nil
@@ -84,7 +84,7 @@ datapad:AddApp({
 			local cat = cats:Add( "DButton" )
 			cat:Dock( TOP )
 			cat:DockMargin( 0, 0, 0, 5 )
-			cat:SetSize( ScrW() * 0.1, ScrH() * 0.033 )
+			cat:SetSize( ScrW() * 0.135 - 5, 40 )
 			
 			cn = string.upper( cn )
 			cat.Paint = function( self, w, h )				
@@ -103,11 +103,14 @@ datapad:AddApp({
 				sCats:Clear()
 				selected = cn
 			
+				local first = true
 				for scn, sc in SortedPairs( c ) do
 					local sCat = sCats:Add( "DLabel" )
 					sCat:Dock( TOP )
-					sCat:DockMargin( 0, 50, 0, 0 )
-					sCat:SetHeight( ScrH() * 0.03 )
+					sCat:DockMargin( 0, first and 5 or 30, 0, 0 )
+					sCat:SetHeight( 40 )
+					
+					first = false
 					
 					scn = string.upper( scn )
 					sCat.Paint = function( self, w, h )				
@@ -147,7 +150,7 @@ datapad:AddApp({
 						local sTitle = vgui.Create( "DLabel", sLeft )
 						sTitle:SetText( s["title"] )
 						sTitle:SetFont( "Trebuchet24" )
-						sTitle:SetHeight( ScrH() * 0.03 )
+						sTitle:SetHeight( 30 )
 						sTitle:SetWrap( true )
 						sTitle:Dock( TOP )
 						

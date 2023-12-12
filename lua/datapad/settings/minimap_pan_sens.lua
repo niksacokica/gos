@@ -52,6 +52,6 @@ datapad:AddSetting({
 			datapad:SaveSetting( "mm_pan_sens", val )
 		end
 
-		return 0.05, 0.14, slider
+		return 0.07, 0.2, slider
 	end
 })

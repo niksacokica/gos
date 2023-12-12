@@ -66,6 +66,6 @@ datapad:AddSetting({
 			toggle:SetValue( newValue )
 		end )
 	
-		return 0.05, 0.11, toggle
+		return 0.1, 0.15, toggle
 	end
 })

@@ -41,6 +41,51 @@ datapad:AddApp({
 		local browser = vgui.Create( "DFileBrowser", window )
 		browser:SetPos( ScrW() * 0.0005, ScrH() * 0.029 )
 		browser:SetSize( ScrW() * 0.3495, ScrH() * 0.3205 )
+
+		browser.SetupFiles = function( self )
+			if ( IsValid( self.Files ) ) then self.Files:Remove() end
+
+			self.Files = self.Divider:Add( "DTileLayout" )
+			self.Files:SetBaseSize(32)
+			self.Files:SetBackgroundColor( Color( 234, 234, 234 ) )
+			self.Files:MakeDroppable( "FilesContentPanel", true )
+
+			self.Divider:SetRight( self.Files )
+
+			if ( self.m_strCurrentFolder && self.m_strCurrentFolder != "" ) then
+				self:ShowFolder( self.m_strCurrentFolder )
+			end
+
+			return true
+		end
+		
+		browser.ShowFolder = function(self, path)
+			if ( !IsValid( self.Files ) ) then return end
+			self.Files:Clear()
+
+			if ( IsValid( self.FileHeader ) ) then
+				self.FileHeader:SetText( path || "Files" )
+			end
+
+			if ( !path ) then return end
+
+			local filters = self.m_strFilter
+			if ( !filters || filters == "" ) then
+				filters = "*.*"
+			end
+
+			for _, filter in ipairs( string.Explode( " ", filters ) ) do
+				local files = file.Find( string.Trim( path .. "/" .. ( filter || "*.*" ), "/" ), self.m_strPath )
+				if ( !istable( files ) ) then continue end
+
+				for _, v in ipairs( files ) do
+					local icon = self.Files:Add( "ContentIcon" )
+					icon:SetMaterial( "datapad/files/doc_" .. string.GetExtensionFromFilename( v ) .. ".png" )
+					icon:SetName( v )
+				end
+
+			end
+		end
 		
 		browser.Refresh = function( self )
 			if not file.Exists( "datapad/personal_files/appdata", "DATA" ) then

@@ -256,7 +256,7 @@ datapad:AddApp({
 		end	)
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.478, 1 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()
@@ -272,6 +272,58 @@ datapad:AddApp({
 			surface.DrawTexturedRectRotated( w * 0.5, h * 0.5, w * 0.05, h * 0.5, 45 )
 			
 			return true
+		end
+		
+		local legend = vgui.Create( "DFrame", window )
+		legend:SetPos( ScrW() * 0.4926 - 200, ScrH() * 0.485 - ( ScrH() > 1000 and 200 or 201 ) )
+		legend:SetSize( 200, 200 )
+		legend:SetTitle( "" )
+		legend:ShowCloseButton( false )
+		legend.ShowLegend = true
+		
+		window.OnKeyCodePressed = function( self, key )
+			if tostring( key ) == "22" then
+				legend.ShowLegend = not legend.ShowLegend
+				
+				if legend.ShowLegend then
+					legend:SetSize( 200, 200 )
+					legend:SetPos( ScrW() * 0.4926 - 200, ScrH() * 0.485 - ( ScrH() > 1000 and 200 or 201 ) )
+				else
+					legend:SetSize( 200, 50 )
+					legend:SetPos( ScrW() * 0.4926 - 200, ScrH() * 0.485 - ( ScrH() > 1000 and 50 or 51 ) )
+				end
+			end
+		end
+		
+		local legend_icons={
+			["mark_npc"] = Material("datapad/other/mark_npc.png"),
+			["mark_player"] = Material("datapad/other/mark_player.png"),
+			["mark_player2"] = Material("datapad/other/mark_player2.png")
+		}		
+		local function drawLegendIcon( icon, desc, x, y, w, h )
+			draw.NoTexture()
+	
+			surface.SetMaterial( legend_icons[icon] )
+			surface.DrawTexturedRect( x, y, w, h )
+			
+			draw.DrawText( desc, "ScoreboardDefault", w * 0.9, h * 0.31 + y, color_white, TEXT_ALIGN_LEFT )
+		end
+		
+		local light_gray = Color( 150, 150, 150, 150 )
+		legend.Paint = function( self, w, h )
+			draw.NoTexture()
+			surface.SetDrawColor( light_gray )
+			surface.DrawRect( 0, 0, w, h )
+			
+			if self.ShowLegend then
+				draw.DrawText( "L - Hide legend", "ScoreboardDefault", w * 0.5, h * 0.82, color_white, TEXT_ALIGN_CENTER )
+				
+				drawLegendIcon( "mark_npc", "- NPCs", 0, 0, w * 0.3, h * 0.3 )
+				drawLegendIcon( "mark_player", "- You", 0, h * 0.25, w * 0.3, h * 0.3 )
+				drawLegendIcon( "mark_player2", "- Other players", 0, h * 0.5, w * 0.3, h * 0.3 )
+			else
+				draw.DrawText( "L - Show legend", "ScoreboardDefault", w * 0.5, h * 0.3, color_white, TEXT_ALIGN_CENTER )
+			end
 		end
 	end
 })

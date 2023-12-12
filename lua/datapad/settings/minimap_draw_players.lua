@@ -60,6 +60,6 @@ datapad:AddSetting({
 			datapad:SaveSetting( "mm_draw_ply", val )
 		end
 	
-		return 0.05, 0.13, toggle
+		return 0.07, 0.2, toggle
 	end
 })

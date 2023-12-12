@@ -16,21 +16,26 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.9985, h * 0.056 )
+			surface.DrawRect( 1, 1, w - 2, h - 2 )
 		end
 		
 		local html = vgui.Create( "DHTML", window )
-		html:SetPos( ScrW() * 0.0005, ScrH() * 0.029 )
-		html:SetSize( ScrW() * 0.4995, ScrH() * 0.471 )
+		html:SetPos( ScrW() * 0.0005, ScrH() * 0.028 + 30 )
+		html:SetSize( ScrW() * 0.5 - 2, ScrH() * 0.472 - 30 )
 		html:OpenURL( "http://wiki.garrysmod.com" )
 		
 		local ctrls = vgui.Create( "DHTMLControls", window )
-		ctrls:SetPos( ScrW() * 0.0005, ScrH() * 0.001 )
-		ctrls:SetSize( ScrW() * 0.49, ScrH() * 0.028 )
+		ctrls:SetPos( ScrW() * 0.0005, 1 )
+		ctrls:SetSize( 130, ScrH() * 0.028 )
 		ctrls:SetHTML( html )
+		ctrls:GetChildren()[5]:Hide()
+		ctrls:GetChildren()[6]:Dock(NODOCK)
+		ctrls:GetChildren()[6]:SetPos( 1, ScrH() * 0.028 )
+		ctrls:GetChildren()[6]:SetSize( ScrW() * 0.5 - 2, 30 )
+		ctrls:GetChildren()[6]:SetParent( window )
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.478, 1 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()

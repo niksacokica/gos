@@ -60,6 +60,6 @@ datapad:AddSetting({
 			datapad:SaveSetting( "mm_draw_npc", val )
 		end
 	
-		return 0.05, 0.1, toggle
+		return 0.07, 0.15, toggle
 	end
 })
