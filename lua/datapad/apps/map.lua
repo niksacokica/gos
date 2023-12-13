@@ -8,6 +8,16 @@ datapad:AddApp({
 		window:ShowCloseButton( false )
 		window:SetTitle( "" )
 		
+		local back_clr = Color( 50, 50, 50 )
+		local color_gray = Color( 150, 150, 150 )
+		window.Paint = function( self, w, h )		
+			surface.SetDrawColor( color_gray )
+			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
+			
+			surface.SetDrawColor( back_clr )
+			surface.DrawRect( 1, 1, w - 2, h - 2 )
+		end
+		
 		local function doHullTrace( newPos )
 			local tr = util.TraceHull( {
 				start = newPos,
@@ -34,11 +44,12 @@ datapad:AddApp({
 			return nil
 		end
 		
+		local map = vgui.Create( "DPanel", window )
+		map:SetPos( 10, ScrH() * 0.028 + 1 )
+		map:SetSize( ScrW() * 0.5 - 20, ScrH() * 0.472 - 11 )
+		
 		local camPos = findGoodPosition( LocalPlayer():GetPos() )
 		local camAng = Angle(90, 0, 90)
-		
-		local back_clr = Color( 50, 50, 50 )
-		local color_gray = Color( 150, 150, 150 )
 		local color_red = Color( 255, 35, 35 )
 		local localPlyMat = Material( "datapad/other/mark_player.png" )
 		local plyMat = Material( "datapad/other/mark_player2.png" )
@@ -46,24 +57,20 @@ datapad:AddApp({
 		local drawNpcs = datapad:GetSetting( "mm_draw_npc", false )
 		local drawPlys = datapad:GetSetting( "mm_draw_ply", false )
 		
-		window.Paint = function( self, w, h )		
-			surface.SetDrawColor( color_gray )
-			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
-			
-			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.9985, h * 0.998 )
-			
+		map.Paint = function( self, w, h )			
 			if not camPos then
 				surface.SetDrawColor( color_black )
-				surface.DrawRect( ScrW() * 0.008, ScrH() * 0.03, w - ScrW() * 0.015, h - ScrH() * 0.045 )
+				surface.DrawRect( 0, 0, w - ScrW() * 0.015, h - ScrH() * 0.045 )
 			
 				surface.SetTextColor( color_red:Unpack() )
 				surface.SetTextPos( ScrW() * 0.17, ScrH() * 0.25 )
 				surface.SetFont( "DermaLarge" )
 				surface.DrawText( "MAP CURRENTLY UNAVAILABLE!" )
+				
 				return
 			end
 			
+			local px, py = self:GetParent():GetPos()
 			local x, y = self:GetPos()
 			
 			local old = DisableClipping( true )
@@ -73,8 +80,8 @@ datapad:AddApp({
 				fov = 75,
 				drawviewmodel = false,
 				bloomtone = false,
-				x = x + ScrW() * 0.008, y = y + ScrH() * 0.03,
-				w = w - ScrW() * 0.015, h = h - ScrH() * 0.045
+				x = px + x, y = py + y,
+				w = w, h = h
 			} )
 			DisableClipping( old )
 			
@@ -127,13 +134,13 @@ datapad:AddApp({
 				local dims = 50000 * zPos
 				local finalPos = Vector( finalX - dims * 0.5, finalY - dims * 0.5, 0 )
 				
-				if finalPos.x + dims > w - ScrH() * 0.01 or finalPos.x + dims * 0.5 < ScrH() * 0.025 or finalPos.y + dims > h - ScrH() * 0.01 or finalPos.y + dims * 0.5 < ScrH() * 0.045 then continue end
+				if finalPos.x > w or finalPos.x + dims < 0 or finalPos.y > h or finalPos.y + dims < 0 then continue end
 				
 				surface.DrawTexturedRect( finalPos.x, finalPos.y, dims, dims )
 			end
 		end
 		
-		window.OnDelete = function( self )
+		map.OnDelete = function( self )
 			for k, v in ipairs( ents.GetAll() ) do
 				if ( v:IsPlayer() or v:IsNPC() ) and v:GetNoDraw() and not ( v == LocalPlayer() ) then
 					v:SetNoDraw( false )
@@ -157,7 +164,7 @@ datapad:AddApp({
 		end
 		
 		local zoomMod = datapad:GetSetting( "mm_zoom_sens", 1 )
-		window.OnMouseWheeled = function( self, data )
+		map.OnMouseWheeled = function( self, data )
 			if not camPos then return end
 		
 			local mod = ( ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000 ) * zoomMod
@@ -171,7 +178,7 @@ datapad:AddApp({
 		
 		local lastPress = nil
 		local panMod = datapad:GetSetting( "mm_pan_sens", 1 )
-		window.OnCursorMoved = function( self, x, y )
+		map.OnCursorMoved = function( self, x, y )
 			if input.IsMouseDown( MOUSE_LEFT ) and camPos then
 				if lastPress and x > ScrW() * 0.008 and x < ScrW() * 0.5 - ScrW() * 0.015 and y > ScrH() * 0.03 and y < ScrH() * 0.5 - ScrH() * 0.045 then
 					local mod = ( ( camPos.z - doLineTraceUD( false )["HitPos"].z ) / 1000 ) * panMod
@@ -256,14 +263,14 @@ datapad:AddApp({
 		end	)
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.478, 1 )
+		cls:SetPos( ScrW() * 0.478 - 1, 1 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()
 		end
 		
 		cls.Paint = function( self, w, h )
-			surface.SetDrawColor( cls:IsHovered() and color_red or back_clr )
+			surface.SetDrawColor( self:IsHovered() and color_red or back_clr )
 			surface.DrawRect( 0, 0, w, h )
 			
 			draw.NoTexture()
@@ -275,7 +282,7 @@ datapad:AddApp({
 		end
 		
 		local legend = vgui.Create( "DFrame", window )
-		legend:SetPos( ScrW() * 0.4926 - 200, ScrH() * 0.485 - ( ScrH() > 1000 and 200 or 201 ) )
+		legend:SetPos( ScrW() * 0.5 - 210, ScrH() * 0.5 - 211 )
 		legend:SetSize( 200, 200 )
 		legend:SetTitle( "" )
 		legend:ShowCloseButton( false )
@@ -287,10 +294,10 @@ datapad:AddApp({
 				
 				if legend.ShowLegend then
 					legend:SetSize( 200, 200 )
-					legend:SetPos( ScrW() * 0.4926 - 200, ScrH() * 0.485 - ( ScrH() > 1000 and 200 or 201 ) )
+					legend:SetPos( ScrW() * 0.5 - 210, ScrH() * 0.5 - 211 )
 				else
 					legend:SetSize( 200, 50 )
-					legend:SetPos( ScrW() * 0.4926 - 200, ScrH() * 0.485 - ( ScrH() > 1000 and 50 or 51 ) )
+					legend:SetPos( ScrW() * 0.5 - 210, ScrH() * 0.5 - 61 )
 				end
 			end
 		end

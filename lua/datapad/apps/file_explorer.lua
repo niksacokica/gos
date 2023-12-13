@@ -27,7 +27,7 @@ datapad:AddApp({
 		end
 		
 		cls.Paint = function( self, w, h )
-			surface.SetDrawColor( cls:IsHovered() and color_red or back_clr )
+			surface.SetDrawColor( self:IsHovered() and color_red or back_clr )
 			surface.DrawRect( 0, 0, w, h )
 			
 			draw.NoTexture()
@@ -52,39 +52,11 @@ datapad:AddApp({
 
 			self.Divider:SetRight( self.Files )
 
-			if ( self.m_strCurrentFolder && self.m_strCurrentFolder != "" ) then
+			if ( self.m_strCurrentFolder and self.m_strCurrentFolder != "" ) then
 				self:ShowFolder( self.m_strCurrentFolder )
 			end
 
 			return true
-		end
-		
-		browser.ShowFolder = function(self, path)
-			if ( !IsValid( self.Files ) ) then return end
-			self.Files:Clear()
-
-			if ( IsValid( self.FileHeader ) ) then
-				self.FileHeader:SetText( path || "Files" )
-			end
-
-			if ( !path ) then return end
-
-			local filters = self.m_strFilter
-			if ( !filters || filters == "" ) then
-				filters = "*.*"
-			end
-
-			for _, filter in ipairs( string.Explode( " ", filters ) ) do
-				local files = file.Find( string.Trim( path .. "/" .. ( filter || "*.*" ), "/" ), self.m_strPath )
-				if ( !istable( files ) ) then continue end
-
-				for _, v in ipairs( files ) do
-					local icon = self.Files:Add( "ContentIcon" )
-					icon:SetMaterial( "datapad/files/doc_" .. string.GetExtensionFromFilename( v ) .. ".png" )
-					icon:SetName( v )
-				end
-
-			end
 		end
 		
 		browser.Refresh = function( self )
@@ -116,15 +88,12 @@ datapad:AddApp({
 		end
 		
 		local function warningPopUp( text )
-			local warning = datapad:CreatePopUp( window )
+			local warning = datapad:CreatePopUp( window, "File explorer warning" )
 			warning:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
 			warning:SetSize( 300, 150 )
 			warning:SetTitle( "WARNING" )
 			warning:MakePopup()
-			
-			warning.Think = function( self )
-				self:MoveToFront()
-			end
+			warning:DoModal()
 
 			local warningText = vgui.Create( "DLabel", warning )
 			warningText:SetPos( 10, 25 )
@@ -142,23 +111,32 @@ datapad:AddApp({
 		end
 		
 		local function addPopUp( curPath, title, rnm, folder )
-			local popUp = datapad:CreatePopUp( window )
+			local popUp = datapad:CreatePopUp( window, "File explorer PopUp" )
 			popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
 			popUp:SetSize( 300, 150 )
 			popUp:SetTitle( title )
 			popUp:MakePopup()
+			popUp:DoModal()
 
 			local name = vgui.Create( "DTextEntry", popUp )
 			name:SetPos( 10, 40 )
 			name:SetSize( 280, 35 )
 			name:SetFont( "DermaLarge" )
 			
+			local cancel = vgui.Create( "DButton", popUp )
+			cancel:SetText( "CANCEL" )
+			cancel:SetPos( 20, 100 )
+			cancel:SetSize( 75, 30 )
+			cancel.DoClick = function()
+				popUp:Close()
+			end
+			
 			if rnm then
 				name:SetText( string.GetFileFromFilename( rnm ) )
 			
 				local ren = vgui.Create( "DButton", popUp )
 				ren:SetText( "RENAME" )
-				ren:SetPos( 115, 100 )
+				ren:SetPos( 205, 100 )
 				ren:SetSize( 70, 30 )
 				ren.DoClick = function()
 					if not file.Rename( rnm, string.GetPathFromFilename( rnm ) .. name:GetText() ) then
@@ -169,15 +147,7 @@ datapad:AddApp({
 					
 					popUp:Close()
 				end
-			else
-				local cancel = vgui.Create( "DButton", popUp )
-				cancel:SetText( "CANCEL" )
-				cancel:SetPos( 20, 100 )
-				cancel:SetSize( 75, 30 )
-				cancel.DoClick = function()
-					popUp:Close()
-				end
-				
+			else				
 				local add = vgui.Create( "DButton", popUp )
 				add:SetText( "ADD" )
 				add:SetPos( 205, 100 )
@@ -206,22 +176,45 @@ datapad:AddApp({
 			end
 		end
 		
-		browser.OnRightClick = function( self, path, pnl )
-			local menu = vgui.Create( "DMenu", window )
-			
-			menu:AddOption( "Open", function()
-				--[[local window = vgui.Create( "DFrame" )
-				window:Center()
-				window:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
-				window:SetParent( self.screen )
-				window:MakePopup()
-				Notepad( window, path )]]
-			end )
-			menu:AddOption( "Rename", function()
-				addPopUp( nil, "File Rename", path )
-			end ) 
-			
-			menu:Open()
+		browser.ShowFolder = function(self, path)
+			if ( !IsValid( self.Files ) ) then return end
+			self.Files:Clear()
+
+			if ( IsValid( self.FileHeader ) ) then
+				self.FileHeader:SetText( path || "Files" )
+			end
+
+			if ( !path ) then return end
+
+			local filters = self.m_strFilter
+			if ( !filters || filters == "" ) then
+				filters = "*.*"
+			end
+
+			for _, filter in ipairs( string.Explode( " ", filters ) ) do
+				local files = file.Find( string.Trim( path .. "/" .. ( filter || "*.*" ), "/" ), self.m_strPath )
+				if ( !istable( files ) ) then continue end
+
+				for _, v in ipairs( files ) do
+					local icon = self.Files:Add( "ContentIcon" )
+					icon:SetMaterial( "datapad/files/doc_" .. string.GetExtensionFromFilename( v ) .. ".png" )
+					icon:SetName( v )
+					icon.DoRightClick = function( self )
+						local menu = vgui.Create( "DMenu", window )
+						
+						menu:AddOption( "Open", function()
+							local text_editor = datapad:StartApp( datapad.apps["text editor"] )
+							text_editor:OpenFile( browser:GetCurrentFolder() .. "/" .. v )
+						end )
+						menu:AddOption( "Rename", function()
+							addPopUp( nil, "File Rename", browser:GetCurrentFolder() .. "/" .. v )
+						end ) 
+						
+						menu:Open()
+					end
+				end
+
+			end
 		end
 		
 		browser:Refresh()
@@ -259,7 +252,7 @@ datapad:AddApp({
 		end )
 		
 		local function delPopUp( curPath, title, folder )
-			local popUp = datapad:CreatePopUp( window )
+			local popUp = datapad:CreatePopUp( window, "File explorer delete" )
 			popUp:SetPos( ScrW() * 0.42, ScrH() * 0.42 )
 			popUp:SetSize( 300, 150 )
 			popUp:SetTitle( title )

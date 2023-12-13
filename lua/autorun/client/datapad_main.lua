@@ -35,6 +35,8 @@ function datapad:StartApp( v )
 	window:MakePopup()
 	
 	local function handleWindowClose()
+		if not window:IsValid() then return end
+	
 		if window.OnDelete then
 			window:OnDelete()
 		end
@@ -60,6 +62,8 @@ function datapad:StartApp( v )
 	v["window"]( window )
 	
 	hook.Run( "DatapadPostAppStart", v, window )
+	
+	return window
 end
 
 function datapad:CreatePopUp( parent, name, icon )

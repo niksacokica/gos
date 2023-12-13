@@ -64,7 +64,7 @@ datapad:AddApp({
 		end
 		
 		cls.Paint = function( self, w, h )
-			surface.SetDrawColor( cls:IsHovered() and color_red or color_white )
+			surface.SetDrawColor( self:IsHovered() and color_red or color_white )
 			surface.DrawRect( 0, 0, w, h )
 			
 			draw.NoTexture()
@@ -120,7 +120,7 @@ datapad:AddApp({
 				txt:SetCaretPos( window.noDel )
 			end
 		end
-		txt.OnKeyCodeTyped = function( self, kc )			
+		txt.OnKeyCodeTyped = function( self, kc )
 			if pressToContinue then
 				if ignore and not ( kc == KEY_TAB ) then return true end
 				

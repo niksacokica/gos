@@ -40,7 +40,7 @@ datapad:AddApp({
 		end
 		
 		cls.Paint = function( self, w, h )
-			surface.SetDrawColor( cls:IsHovered() and color_red or back_clr )
+			surface.SetDrawColor( self:IsHovered() and color_red or back_clr )
 			surface.DrawRect( 0, 0, w, h )
 			
 			draw.NoTexture()
