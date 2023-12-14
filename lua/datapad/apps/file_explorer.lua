@@ -122,6 +122,7 @@ datapad:AddApp({
 			name:SetPos( 10, 40 )
 			name:SetSize( 280, 35 )
 			name:SetFont( "DermaLarge" )
+			name:SetDrawLanguageID( false )
 			
 			local cancel = vgui.Create( "DButton", popUp )
 			cancel:SetText( "CANCEL" )
@@ -333,6 +334,7 @@ datapad:AddApp({
 		searchEntry:SetPos( ScrW() * 0.1, ScrH() * 0.007 )
 		searchEntry:SetSize( ScrW() * 0.1, ScrH() * 0.017 )
 		searchEntry:SetFont( "DermaDefault" )
+		searchEntry:SetDrawLanguageID( false )
 		searchEntry.OnEnter = function( self, value )
 			browser:SetSearch( value )
 		end

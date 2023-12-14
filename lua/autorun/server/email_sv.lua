@@ -24,7 +24,7 @@ net.Receive( "datapad_email_get", function( len, ply )
 					local email = util.JSONToTable( file.Read( path .. "/" .. v, "DATA" ) )
 				
 					if email then
-						table.insert( ( email["type"] == "out" ) and emails["out"] or emails["in"], { ["title"] = email["title"], ["id"] = v } )
+						table.insert( ( email["type"] == "out" ) and emails["out"] or emails["in"], { ["title"] = email["title"], ["id"] = v, ["sender_name"] = email["sender_name"], ["time"] = email["time"] } )
 					else
 						print( v .. " is corrupted!" )
 					end
@@ -51,6 +51,7 @@ end )
 net.Receive( "datapad_email_send", function( len, ply )
 	local recs = net.ReadString()
 	local sender = ply:SteamID64()
+	local sender_name = ply:Nick()
 	local title = net.ReadString()
 	local body = net.ReadString()
 	local sendTime = os.time()
@@ -77,7 +78,8 @@ net.Receive( "datapad_email_send", function( len, ply )
 			["title"] = title,
 			["body"] = body,
 			["sender"] = sender,
-			["receivers"] = recs,
+			["sender_name"] = sender_name,
+			["recipients"] = recs,
 			["time"] = sendTime,
 			["type"] = "in"
 		}
@@ -97,7 +99,8 @@ net.Receive( "datapad_email_send", function( len, ply )
 		["title"] = title,
 		["body"] = body,
 		["sender"] = sender,
-		["receivers"] = recs,
+		["sender_name"] = sender_name,
+		["recipients"] = recs,
 		["time"] = sendTime,
 		["type"] = "out"
 	}

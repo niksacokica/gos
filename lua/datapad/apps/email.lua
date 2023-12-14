@@ -16,11 +16,11 @@ datapad:AddApp({
 			surface.DrawOutlinedRect( 0, 0, w, h, 1 )
 			
 			surface.SetDrawColor( back_clr )
-			surface.DrawRect( w * 0.0015, h * 0.002, w * 0.9985, h * 0.998 )
+			surface.DrawRect( 1, 1, w - 2, h - 2 )
 		end
 		
 		local cls = vgui.Create( "DButton", window )
-		cls:SetPos( ScrW() * 0.478, ScrH() * 0.001 )
+		cls:SetPos( ScrW() * 0.478 - 1, 1 )
 		cls:SetSize( ScrW() * 0.022, ScrH() * 0.028 )
 		cls.DoClick = function()
 			window:Close()
@@ -39,8 +39,8 @@ datapad:AddApp({
 		end
 		
 		local emails = vgui.Create( "DScrollPanel", window )
-		emails:SetPos( ScrW() * 0.01, ScrH() * 0.056 )
-		emails:SetSize( ScrW() * 0.48, ScrH() * 0.43 )
+		emails:SetPos( 20, ScrH() * 0.03 + 40 )
+		emails:SetSize( ScrW() * 0.5 - 40, ScrH() * 0.47 - 60 )
 		
 		local emailsbar = emails:GetVBar()
 		emailsbar.btnUp.Paint = nil
@@ -61,9 +61,8 @@ datapad:AddApp({
 			
 			for k, v in ipairs( datapad.Emails[eType] ) do
 				local email = emails:Add( "DButton" )
-				email:SetText( v["title"] )
+				email:SetText( "" )
 				email:Dock( TOP )
-				email:DockMargin( 0, 0, 0, 5 )
 				
 				email.DoClick = function( self )
 					net.Start( "datapad_email_get" )
@@ -71,131 +70,220 @@ datapad:AddApp({
 						net.WriteString( v["id"] )
 					net.SendToServer()
 				end
+				
+				email.Paint = function( self, w, h )
+					draw.NoTexture()
+				
+					local clr = ( self:IsHovered() and color_gray or color_white )
+					surface.SetDrawColor( clr:Unpack() )
+					surface.DrawRect( 0, 0, w, h )
+					
+					surface.SetDrawColor( color_gray:Unpack() )
+					surface.DrawLine( 0, 0, w, 0 )
+					
+					draw.SimpleText( v["sender_name"], "DermaDefault", 10, h * 0.5, color_black, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
+					draw.SimpleText( v["title"], "DermaDefault", w * 0.5, h * 0.5, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+					draw.SimpleText( os.date( "%H:%M:%S - %d.%m.%Y." , v["time"] ), "DermaDefault", w - 10, h * 0.5, color_black, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+				end
+			end
+		end
+		
+		local emailText = "NEW EMAIL"
+		local newShowEmailPanels = {}
+		local function destroyNewShowEmail()
+			emailText = "NEW EMAIL"
+			emails:Show()
+			
+			if #newShowEmailPanels > 0 then
+				for k, v in ipairs( newShowEmailPanels ) do
+					v:Remove()
+				end
+				
+				table.Empty( newShowEmailPanels )
 			end
 		end
 		
 		local function emailDetails( email )
+			destroyNewShowEmail()
+		
+			emailText = "NEW EMAIL"
+			emails:Hide()
+			
+			local details = vgui.Create( "DPanel", window )
+			details:SetPos( 20, ScrH() * 0.03 + 40 )
+			details:SetSize( ScrW() * 0.5 - 40, ScrH() * 0.47 - 60 )
+			
+			local color_lightGray = Color( 200, 200, 200 )
+			details.Paint = function( self, w, h )
+				draw.NoTexture()
+				
+				surface.SetDrawColor( color_white:Unpack() )
+				surface.DrawRect( 0, 0, w, h )
+				
+				surface.SetDrawColor( color_lightGray:Unpack() )
+				surface.DrawLine( 10, 50, w - 10, 50 )
+			end
+			
+			local title = vgui.Create( "DTextEntry", window )
+			title:SetPos( 30, ScrH() * 0.03 + 50 )
+			title:SetSize( ScrW() * 0.5 - 60, 30 )
+			title:SetFont( "ScoreboardDefaultTitle" )
+			title:SetText( email["title"] )
+			title:SetEnabled( false )
+			title:SetDrawBackground( false )
+			title:SetDrawLanguageID( false )
+			
+			local sender = vgui.Create( "DTextEntry", window )
+			sender:SetPos( 30, ScrH() * 0.03 + 100 )
+			sender:SetSize( ScrW() * 0.5 - 60, 30 )
+			sender:SetFont( "HudSelectionText" )
+			sender:SetText( email["sender_name"] .. " (" .. email["sender"] .. ")" )
+			sender:SetEnabled( false )
+			sender:SetDrawBackground( false )
+			sender:SetDrawLanguageID( false )
+			
+			local dateTime = vgui.Create( "DTextEntry", window )
+			dateTime:SetPos( ScrW() * 0.5 - 235, ScrH() * 0.03 + 100 )
+			dateTime:SetSize( 205, 30 )
+			dateTime:SetFont( "HudSelectionText" )
+			dateTime:SetText( os.date( "%H:%M:%S - %d.%m.%Y." , email["time"] ) )
+			dateTime:SetEnabled( false )
+			dateTime:SetDrawBackground( false )
+			dateTime:SetDrawLanguageID( false )
+			
+			local recipients = vgui.Create( "DTextEntry", window )
+			recipients:SetPos( 30, ScrH() * 0.03 + 120 )
+			recipients:SetSize( ScrW() * 0.5 - 60, 30 )
+			recipients:SetFont( "DefaultSmall" )
+			recipients:SetText( "Recipients: " .. email["recipients"] )
+			recipients:SetEnabled( false )
+			recipients:SetDrawBackground( false )
+			recipients:SetDrawLanguageID( false )
+			
+			local content = vgui.Create( "DTextEntry", window )
+			content:SetPos( 30, ScrH() * 0.03 + 175 )
+			content:SetSize( ScrW() * 0.5 - 60, ScrH() * 0.47 - 205 )
+			content:SetText( email["body"] )
+			content:SetEnabled( false )
+			content:SetVerticalScrollbarEnabled( true )
+			content:SetDrawBackground( false )
+			content:SetDrawLanguageID( false )
+			content:SetMultiline( true )
+		
+			table.insert( newShowEmailPanels, details )
+			table.insert( newShowEmailPanels, title )
+			table.insert( newShowEmailPanels, sender )
+			table.insert( newShowEmailPanels, dateTime )
+			table.insert( newShowEmailPanels, recipients )
+			table.insert( newShowEmailPanels, content )
 			PrintTable( email )
 		end
 		
-		local emailText = "NEW EMAIL"
-		local newEmailPanels = {}
 		local function newEmail()
+			destroyNewShowEmail()
+		
 			emailText = "SEND"
 			emails:Hide()
 		
 			local recipientLabel = vgui.Create( "DLabel", window )
-			recipientLabel:SetPos( ScrW() * 0.01, ScrH() * 0.06 )
+			recipientLabel:SetPos( 20, ScrH() * 0.03 + 50 )
 			recipientLabel:SetSize( 100, 30 )
 			recipientLabel:SetFont( "CloseCaption_Normal" )
 			recipientLabel:SetText( "Recipient" )
 		
-			local recipient = vgui.Create( "DTextEntry", window )
-			recipient:SetPos( 120, ScrH() * 0.062 )
-			recipient:SetSize( ScrW() * 0.443, ScrH() * 0.02 )
-			recipient:SetVerticalScrollbarEnabled( false )
-			recipient:SetDrawLanguageID( false )
-			recipient:SetMultiline( false )
-			recipient:SetFont( "CloseCaption_Normal" )
+			local recipients = vgui.Create( "DTextEntry", window )
+			recipients:SetPos( 120, ScrH() * 0.03 + 50 )
+			recipients:SetSize( ScrW() * 0.5 - 140, 35 )
+			recipients:SetVerticalScrollbarEnabled( false )
+			recipients:SetDrawLanguageID( false )
+			recipients:SetMultiline( false )
+			recipients:SetFont( "CloseCaption_Normal" )
 			
 			local titleLabel = vgui.Create( "DLabel", window )
-			titleLabel:SetPos( ScrW() * 0.01, ScrH() * 0.1 )
+			titleLabel:SetPos( 20, ScrH() * 0.03 + 100 )
 			titleLabel:SetSize( 100, 30 )
 			titleLabel:SetFont( "CloseCaption_Normal" )
 			titleLabel:SetText( "Title" )
 			
 			local title = vgui.Create( "DTextEntry", window )
-			title:SetPos( 120, ScrH() * 0.1 )
-			title:SetSize( ScrW() * 0.443, ScrH() * 0.02 )
+			title:SetPos( 120, ScrH() * 0.03 + 100 )
+			title:SetSize( ScrW() * 0.5 - 140, 35 )
 			title:SetVerticalScrollbarEnabled( false )
 			title:SetDrawLanguageID( false )
 			title:SetMultiline( false )
 			title:SetFont( "CloseCaption_Normal" )
 		
 			local body = vgui.Create( "DTextEntry", window )
-			body:SetPos( ScrW() * 0.01, ScrH() * 0.14 )
-			body:SetSize( ScrW() * 0.48, ScrH() * 0.343 )
+			body:SetPos( 20, ScrH() * 0.03 + 150 )
+			body:SetSize( ScrW() * 0.5 - 40, ScrH() * 0.47 - 170 )
 			body:SetVerticalScrollbarEnabled( true )
 			body:SetDrawLanguageID( false )
 			body:SetMultiline( true )
 			body:SetFont( "CloseCaption_Normal" )
 			
-			table.insert( newEmailPanels, recipientLabel )
-			table.insert( newEmailPanels, recipient )
-			table.insert( newEmailPanels, titleLabel )
-			table.insert( newEmailPanels, title )
-			table.insert( newEmailPanels, body )
-		end
-		
-		local function destroyNewEmail()
-			emailText = "NEW EMAIL"
-			emails:Show()
-			
-			if #newEmailPanels > 0 then
-				for k, v in ipairs( newEmailPanels ) do
-					v:Remove()
-				end
-				
-				table.Empty( newEmailPanels )
-			end
+			table.insert( newShowEmailPanels, recipientLabel )
+			table.insert( newShowEmailPanels, recipients )
+			table.insert( newShowEmailPanels, titleLabel )
+			table.insert( newShowEmailPanels, title )
+			table.insert( newShowEmailPanels, body )
 		end
 		
 		local function sendEmail()
-			if #newEmailPanels == 0 or not newEmailPanels[2] or #newEmailPanels[2]:GetText() == 0 or not newEmailPanels[4] or #newEmailPanels[4]:GetText() == 0 or not newEmailPanels[5] or #newEmailPanels[5]:GetText() == 0 then return end
+			if #newShowEmailPanels == 0 or not newShowEmailPanels[2] or #newShowEmailPanels[2]:GetText() == 0 or not newShowEmailPanels[4] or #newShowEmailPanels[4]:GetText() == 0 or not newShowEmailPanels[5] or #newShowEmailPanels[5]:GetText() == 0 then return end
 		
 			net.Start( "datapad_email_send" )
-				net.WriteString( newEmailPanels[2]:GetText() )
-				net.WriteString( newEmailPanels[4]:GetText() )
-				net.WriteString( newEmailPanels[5]:GetText() )
+				net.WriteString( newShowEmailPanels[2]:GetText() )
+				net.WriteString( newShowEmailPanels[4]:GetText() )
+				net.WriteString( newShowEmailPanels[5]:GetText() )
 			net.SendToServer()
 		end
 		
 		local newButt = vgui.Create( "DButton", window )
-		newButt:SetPos( ScrW() * 0.42, ScrH() * 0.032 )
-		newButt:SetSize( 171, 30 )
+		newButt:SetPos( ScrW() * 0.5 - 191, ScrH() * 0.03 )
+		newButt:SetSize( 171, 40 )
 		newButt.inb = true
 		newButt.DoClick = function( self )
 			if emailText == "NEW EMAIL" then
 				newEmail()
 			else
 				sendEmail()
-				destroyNewEmail()
+				destroyNewShowEmail()
 			end
 		end
 		
 		newButt.Paint = function( self, w, h )
-			draw.RoundedBox( 25, 5, 0, w-5, h, color_gray )
-			draw.SimpleText( emailText, "DermaLarge", ScrW() * 0.034, ScrH() * 0.01, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+			draw.RoundedBoxEx( 50, 0, 0, w, h, color_gray, true, true )
+			draw.SimpleText( emailText, "DermaLarge", w * 0.5, h * 0.5, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		
 			return true
 		end
 		
 		local inboxButt = vgui.Create( "DButton", window )
-		inboxButt:SetPos( ScrW() * 0.01, ScrH() * 0.0285 )
+		inboxButt:SetPos( 20, ScrH() * 0.03 )
 		inboxButt:SetSize( 121, 40 )
 		inboxButt.inb = true
 		inboxButt.DoClick = function( self )
-			destroyNewEmail()
+			destroyNewShowEmail()
 			emailsFill( "in" )
 			self:MoveToFront()
 		end
 
 		local sentButt = vgui.Create( "DButton", window )
-		sentButt:SetPos( ScrW() * 0.05, ScrH() * 0.0285 )
+		sentButt:SetPos( 121, ScrH() * 0.03 )
 		sentButt:SetSize( 121, 40 )
 		sentButt.DoClick = function( self )
-			destroyNewEmail()
+			destroyNewShowEmail()
 			emailsFill( "out" )
 			self:MoveToFront()
 		end
 		
 		local btn_selected = Color( 0, 0, 255 )
-		local btn_unselected = Color( 0, 0, 100 )
+		local btn_unselected = Color( 0, 0, 150 )
 		local function cardPaint( self, w, h )
 			local child = window:GetChildren()
 		
 			draw.RoundedBoxEx( 50, 0, 0, w, h, ( child[#child] == self and btn_selected or btn_unselected ), true, true )
-			draw.SimpleText( self.inb and "Inbox" or "Sent", "DermaLarge", ScrW() * 0.023, ScrH() * 0.013, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+			draw.SimpleText( self.inb and "Inbox" or "Sent", "DermaLarge", w * 0.5, h * 0.5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		
 			return true
 		end
