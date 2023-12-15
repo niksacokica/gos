@@ -42,7 +42,7 @@ SWEP.ViewModelBoneMods = {
 	["Slam_panel"] = { scale = Vector(0.009, 0.009, 0.009), pos = Vector(10, 3, -1), angle = Angle(0, 0, 0) },
 	["Detonator"] = { scale = Vector(0.009, 0.009, 0.009), pos = Vector(10, 3, -1), angle = Angle(0, 0, 0) },
 	
-	["ValveBiped.Bip01_L_UpperArm"] = { scale = Vector(1, 1, 1), pos = Vector(1.5, 0, 0), angle = Angle(0, -10, -10) },
+	["ValveBiped.Bip01_L_UpperArm"] = { scale = Vector(1, 1, 1), pos = Vector(5, 0, 0), angle = Angle(0, -10, -10) },
 	["ValveBiped.Bip01_L_Forearm"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(6, -20, 0) },
 	["ValveBiped.Bip01_L_Hand"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(40, -5, -40) },
 	
@@ -66,14 +66,13 @@ SWEP.ViewModelBoneMods = {
 	["ValveBiped.Bip01_L_Finger41"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 50, 0) },
 	["ValveBiped.Bip01_L_Finger42"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 80, 0) },
 	
-	
-	["ValveBiped.Bip01_R_UpperArm"] = { scale = Vector(1, 1, 1), pos = Vector(-0.5, 0, 0), angle = Angle(5, 0, 0) },
+	["ValveBiped.Bip01_R_UpperArm"] = { scale = Vector(1, 1, 1), pos = Vector(2.7, 0.9, 0), angle = Angle(5, 0, 0) },
 	["ValveBiped.Bip01_R_Forearm"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(-10, -10, 10) },
 	["ValveBiped.Bip01_R_Hand"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(30, -10, 0) }
 }
 	
 SWEP.VElements = {
-	["tablet"] = { model = "models/niksacokica/tablet/tablet.mdl", bone = "Slam_base", pos = Vector(2, -75, 14), angle = Angle(220, 11, -25), size = Vector(1.2, 1.2, 1.2) }
+	["tablet"] = { model = "models/niksacokica/tablet/tablet.mdl", bone = "Slam_base", pos = Vector(2, -75, 14), angle = Angle(215, 14, -40), size = Vector(0.66, 0.66, 0.66) }
 }
 
 function SWEP:Initialize()

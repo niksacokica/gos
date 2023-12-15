@@ -1,0 +1,19 @@
+"VertexLitGeneric"
+{
+    "$basetexture" "niksacokica/console/console_d"
+    "$bumpmap" "niksacokica/console/console_n"
+    "$phongexponenttexture"    "niksacokica/console/console_s"
+
+    "$color2"    "[1 1 1]"
+    "$blendTintByBaseAlpha"    "1"
+
+    "$phong" "1"
+    "$phongboost"    "4"
+
+    "$phongfresnelranges"    "[0.05 0.115 0.945]"
+
+    "$normalmapalphaenvmapmask"        "1"
+    "$envmapfresnel"    "1"
+
+    "$envmaptint"        "[.5 .5 .5]"
+}
