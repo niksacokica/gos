@@ -220,7 +220,7 @@ datapad:AddApp({
 						file.Write( openFile, editor:GetText() )
 						
 						if not file.Exists( openFile, "DATA" ) or string.len( filename:GetText() ) == 0 then
-							warningPopUp( "The file\"" .. openFile .. "\" has an incorrect name.\nThe filename must end with one of the following: .txt, .dat, .json, .xml, .csv, .jpg, .jpeg, .png, .vtf, .vmt, .mp3, .wav, .ogg! Restricted symbols are: \" :" )
+							warningPopUp( window, "The file\"" .. openFile .. "\" has an incorrect name.\nThe filename must end with one of the following: .txt, .dat, .json, .xml, .csv, .jpg, .jpeg, .png, .vtf, .vmt, .mp3, .wav, .ogg! Restricted symbols are: \" :" )
 						else
 							window.fileName = filename:GetText()
 							window.openFile = openFile

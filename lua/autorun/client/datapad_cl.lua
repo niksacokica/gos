@@ -108,11 +108,21 @@ local function populateApps( grid )
 	local hookReturn = hook.Run( "DatapadPreAppPopulate", datapad.apps )
 	if hookReturn then return end
 
+	local once = datapad:GetSetting( "datapad_app_click_count", false )
 	for k, v in SortedPairs( datapad.apps ) do
+		if #grid:GetItems() >= 50 then break end
+	
 		local app = vgui.Create( "DButton" )
 		app:SetSize( grid:GetColWide()*0.8, grid:GetRowHeight()*0.8 )
-		app.DoDoubleClick = function()
-			datapad:StartApp( v )
+		
+		if once then
+			app.DoClick = function()
+				datapad:StartApp( v )
+			end
+		else
+			app.DoDoubleClick = function()
+				datapad:StartApp( v )
+			end
 		end
 		
 		local app_icon = Material( v["icon"] )
@@ -334,4 +344,10 @@ end )
 hook.Add( "InitPostEntity", "DatapadPlayerLoaded", function()
 	net.Start( "datapad_ply_first" )
 	net.SendToServer()
+end )
+
+net.Receive( "datapad_ply_death", function()
+	if datapad.screen and datapad.screen:IsValid() then
+		datapad.screen:Remove()
+	end
 end )

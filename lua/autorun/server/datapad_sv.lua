@@ -14,6 +14,7 @@ util.AddNetworkString( "datapad_open" )
 util.AddNetworkString( "datapad_ply_first" )
 util.AddNetworkString( "datapad_get_dev" )
 util.AddNetworkString( "datapad_set_dev" )
+util.AddNetworkString( "datapad_ply_death" )
 
 local function sendDev( ply, first )
 	net.Start( "datapad_get_dev" )
@@ -30,4 +31,9 @@ net.Receive( "datapad_set_dev", function()
 	datapad.devMode = net.ReadBool()
 
 	sendDev( player.GetHumans(), false )
+end )
+
+hook.Add( "PlayerDeath", "DatapadPlayerDeath", function( victim )
+	net.Start( "datapad_ply_death" )
+	net.Send( victim )
 end )

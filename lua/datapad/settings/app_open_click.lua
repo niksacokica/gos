@@ -1,18 +1,18 @@
 datapad:AddSetting({
-	["setting"] = "dev_mode",
+	["setting"] = "app_open_click",
 	["creator"] = "niksacokica",
-	["title"] = "Developer mode",
-	["description"] = "Enable/disable developer mode ( admin+ ).",
+	["title"] = "Click once to open apps",
+	["description"] = "Open apps with a double or a single click.",
 	["category"] = "General",
-	["subCategory"] = "Developers",
+	["subCategory"] = "Apps",
 	["visible"] = function()	
-		return LocalPlayer():IsAdmin()
+		return true
 	end,
 	["function"] = function()
 		local toggle = vgui.Create( "DCheckBox" )
 		toggle:SetPos( 0, 0 )
 		toggle:SetSize( ScrW() * 0.05, ScrH() * 0.04 )
-		toggle:SetValue( datapad.devMode )
+		toggle:SetValue( datapad:GetSetting( "datapad_app_click_count", false ) )
 		
 		local togPos = toggle:GetChecked() and 0.0285 or 0.0115
 		local clicked = false
@@ -57,11 +57,21 @@ datapad:AddSetting({
 		function toggle:OnChange( val )
 			clicked = true
 			
-			net.Start( "datapad_set_dev" )
-				net.WriteBool( not datapad.devMode )
-			net.SendToServer()
+			
+			
+			for k, v in ipairs( datapad.screen:GetChildren()[5]:GetChildren() ) do
+				if val then
+					v.DoClick = v.DoDoubleClick
+					v.DoDoubleClick = function() end
+				else
+					v.DoDoubleClick = v.DoClick
+					v.DoClick = function() end
+				end
+			end
+			
+			datapad:SaveSetting( "datapad_app_click_count", val )
 		end
 	
-		return 0.1, 0.15, toggle
+		return 0.07, 0.15, toggle
 	end
 })

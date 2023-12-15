@@ -41,7 +41,7 @@ datapad:AddCommand({
 			end
 		end
 		
-		local newApp = datapad:startApp( datapad.apps["Command Prompt"] )
+		local newApp = datapad:StartApp( datapad.apps["Command Prompt"] )
 		if qIsSet then
 			newApp.noDel = 0
 			newApp:SetEcho( false )

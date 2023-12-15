@@ -81,7 +81,7 @@ datapad:AddApp({
 					surface.SetDrawColor( color_gray:Unpack() )
 					surface.DrawLine( 0, 0, w, 0 )
 					
-					draw.SimpleText( v["sender_name"], "DermaDefault", 10, h * 0.5, color_black, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
+					draw.SimpleText( v["send_rec"], "DermaDefault", 10, h * 0.5, color_black, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
 					draw.SimpleText( v["title"], "DermaDefault", w * 0.5, h * 0.5, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 					draw.SimpleText( os.date( "%H:%M:%S - %d.%m.%Y." , v["time"] ), "DermaDefault", w - 10, h * 0.5, color_black, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
 				end
