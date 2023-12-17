@@ -7,8 +7,8 @@ gos:AddCommand({
 		if #args > 1 then
 			table.remove( args, 1 )
 			
-			local app_name = table.concat( args, " " )
-			if not gos.apps[string.lower( app_name )] then return "The system cannot find the app specified.\n" end
+			local app_name = string.lower( table.concat( args, " " ) )
+			if not gos.apps[app_name] then return "The system cannot find the app specified.\n" end
 			
 			gos:StartApp( gos.apps[app_name] )
 			return ""

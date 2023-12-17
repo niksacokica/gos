@@ -18,7 +18,7 @@ function gos:AddApp( app )
 	
 	if #app["name"] == 0 then
 		return
-	elseif istable( self.apps[app["name"]] ) and not gos.devMode then
+	elseif istable( self.apps[string.lower(app["name"])] ) and not gos.devMode then
 		ErrorNoHalt( "App with the name  '" .. app["name"] .. "'  already exists!" )
 	elseif not hookReturn then
 		self.apps[string.lower( app["name"] )] = app

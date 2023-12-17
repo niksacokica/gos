@@ -55,28 +55,32 @@ gos:AddApp({
 		photo:SetPos( ScrW() * 0.424, ScrH() * 0.2 )
 		photo:SetSize( ScrH() * 0.1, ScrH() * 0.1 )
 		photo:SetImage( "gos/other/camera.png" )
+		
+		local pic = false
 		photo.DoClick = function()
 			LocalPlayer():DrawViewModel( false )
 			window:GetParent():Hide()
+			pic = true
 			
 			LocalPlayer():ConCommand( "jpeg" )
 			
-			hook.Add( "HUDShouldDraw", "CamNoHUD", function()
+			hook.Add( "HUDShouldDraw", "gOSCamNoHUD", function()
 				return false
 			end )
 			
 			timer.Simple( 1, function()
-				hook.Remove( "HUDShouldDraw", "CamNoHUD" )
+				hook.Remove( "HUDShouldDraw", "gOSCamNoHUD" )
 			
 				window:GetParent():Show()
 				LocalPlayer():DrawViewModel( true )
+				pic = false
 			end )
 			
 			return true
 		end
 		
 		local plyAngles = LocalPlayer():LocalEyeAngles()
-		hook.Add( "CreateMove", "CamFreeze", function( cmd )
+		hook.Add( "CreateMove", "gOSCamFreeze", function( cmd )
 			if pic then
 				cmd:SetViewAngles( plyAngles )
 				cmd:ClearButtons()
