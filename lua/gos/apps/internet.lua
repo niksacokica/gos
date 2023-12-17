@@ -29,10 +29,12 @@ gos:AddApp({
 		ctrls:SetSize( 130, ScrH() * 0.028 )
 		ctrls:SetHTML( html )
 		ctrls:GetChildren()[5]:Hide()
-		ctrls:GetChildren()[6]:Dock(NODOCK)
-		ctrls:GetChildren()[6]:SetPos( 1, ScrH() * 0.028 )
-		ctrls:GetChildren()[6]:SetSize( ScrW() * 0.5 - 2, 30 )
-		ctrls:GetChildren()[6]:SetParent( window )
+		
+		local ctrlsSearch = ctrls:GetChildren()[6]
+		ctrlsSearch:Dock(NODOCK)
+		ctrlsSearch:SetPos( 1, ScrH() * 0.028 )
+		ctrlsSearch:SetSize( ScrW() * 0.5 - 2, 30 )
+		ctrlsSearch:SetParent( window )
 		
 		local cls = vgui.Create( "DButton", window )
 		cls:SetPos( ScrW() * 0.478, 1 )

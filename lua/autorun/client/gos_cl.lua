@@ -25,8 +25,8 @@ function gos:AddApp( app )
 	end
 end
 
-function gos:StartApp( v )
-	local hookReturn = hook.Run( "gOSPreAppStart", v )
+function gos:StartApp( app )
+	local hookReturn = hook.Run( "gOSPreAppStart", app )
 	if hookReturn or #self.OpenApps >= math.floor( ( ScrW() - 250 ) / 40 ) then return end
 
 	local window = vgui.Create( "DFrame", self.screen )
@@ -42,10 +42,10 @@ function gos:StartApp( v )
 		end
 		
 		for key, val in ipairs( self.OpenApps ) do
-			if val[2] == v["name"] and val[1] == window then
+			if val[2] == app["name"] and val[1] == window then
 				table.remove( self.OpenApps, key )
 				
-				hook.Run( "gOSAppClosed", v )
+				hook.Run( "gOSAppClosed", app )
 				return
 			end
 		end
@@ -282,7 +282,7 @@ local function taskBar( background )
 	hook.Run( "gOSPostTaskBar", bar )
 end
 
-function gos:createScreen()
+function gos:CreateScreen()
 	local hookReturn = hook.Run( "gOSPreScreenCreate" )
 	if hookReturn then return end
 
@@ -324,7 +324,7 @@ end
 
 net.Receive( "gos_open", function()
 	if not gos.screen or not gos.screen:IsValid() then
-		gos:createScreen()
+		gos:CreateScreen()
 	end
 end )
 
@@ -350,7 +350,7 @@ end )
 
 hook.Add( "gOSShutdownRestart", "gOSShutdownRestart", function()
 	if not gos.screen or not gos.screen:IsValid() then
-		gos:createScreen()
+		gos:CreateScreen()
 	end
 end )
 

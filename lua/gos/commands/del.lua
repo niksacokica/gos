@@ -5,7 +5,7 @@ gos:AddCommand({
 	["help"] = "DEL [/S] names\n\n" ..
 		"  names         Specifies a list of one or more files or directories.\n" ..
 		"                Wildcards may be used to delete multiple files. If a\n" ..
-		"                directory is specified, all files within the directory" ..
+		"                directory is specified, all files within the directory\n" ..
 		"                will be deleted.\n" ..
 		"  /S            Delete specified files from all subdirectories.",
 	["function"] = function( args, window )

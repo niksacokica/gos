@@ -81,7 +81,7 @@ end
 
 function SWEP:PrimaryAttack()
 	if CLIENT then
-		gos:createScreen()
+		gos:CreateScreen()
 	end
 end
 

@@ -9,7 +9,7 @@ gos:AddCommand({
 		"    3 = Aqua        B = Light Aqua\n    4 = Red         C = Light Red\n    5 = Purple      D = Light Purple\n" ..
 		"    6 = Yellow      E = Light Yellow\n    7 = White       F = Bright White\n\n" ..
 		"If no argument is given, this command restores the color to what it was when command prompt started.\n" ..
-		"Doesn't do anything if foreground and background color are the same value",
+		"Doesn't do anything if foreground and background color are the same value.",
 	["function"] = function( args, window )
 		local colors = {
 			["0"] = Color(12, 12, 12),

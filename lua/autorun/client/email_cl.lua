@@ -10,7 +10,8 @@ end )
 
 net.Receive( "gos_email_new", function()
 	local eType = net.ReadString()
+	local email = net.ReadTable()
 	table.insert( gos.Emails[eType], net.ReadTable() )
 	
-	hook.Run( "gOSEmailNewEmail", eType )
+	hook.Run( "gOSEmailNewEmail", eType, email )
 end )
