@@ -1,17 +1,17 @@
-util.AddNetworkString( "datapad_email_send" )
-util.AddNetworkString( "datapad_email_new" )
-util.AddNetworkString( "datapad_email_get" )
-util.AddNetworkString( "datapad_email_all" )
-util.AddNetworkString( "datapad_email_details" )
+util.AddNetworkString( "gos_email_send" )
+util.AddNetworkString( "gos_email_new" )
+util.AddNetworkString( "gos_email_get" )
+util.AddNetworkString( "gos_email_all" )
+util.AddNetworkString( "gos_email_details" )
 
-if not file.Exists( "datapad/emails", "DATA" ) then
-	file.CreateDir( "datapad/emails" )
+if not file.Exists( "gos/emails", "DATA" ) then
+	file.CreateDir( "gos/emails" )
 end
 
-net.Receive( "datapad_email_get", function( len, ply )
+net.Receive( "gos_email_get", function( len, ply )
 	if net.ReadBool() then
-		net.Start( "datapad_email_all" )
-			local path = "datapad/emails/" .. ply:SteamID64()
+		net.Start( "gos_email_all" )
+			local path = "gos/emails/" .. ply:SteamID64()
 			
 			local emails = {
 				["in"] = {},
@@ -34,10 +34,10 @@ net.Receive( "datapad_email_get", function( len, ply )
 			net.WriteTable( emails )
 		net.Send( ply )
 	else
-		net.Start( "datapad_email_details" )
+		net.Start( "gos_email_details" )
 			local email
 			
-			local path = "datapad/emails/" .. ply:SteamID64() .. "/" .. net.ReadString()
+			local path = "gos/emails/" .. ply:SteamID64() .. "/" .. net.ReadString()
 			if file.Exists( path, "DATA" ) then
 				email = file.Read( path, "DATA" )
 			end
@@ -48,7 +48,7 @@ net.Receive( "datapad_email_get", function( len, ply )
 	end
 end )
 
-net.Receive( "datapad_email_send", function( len, ply )
+net.Receive( "gos_email_send", function( len, ply )
 	local recs = net.ReadString()
 	local sender = ply:SteamID64()
 	local sender_name = ply:Nick()
@@ -69,7 +69,7 @@ net.Receive( "datapad_email_send", function( len, ply )
 			end
 		end
 		
-		local path = "datapad/emails/" .. ( rec and rec:SteamID64() or v )
+		local path = "gos/emails/" .. ( rec and rec:SteamID64() or v )
 		if not file.Exists( path, "DATA" ) then
 			file.CreateDir( path )
 		end
@@ -88,7 +88,7 @@ net.Receive( "datapad_email_send", function( len, ply )
 		file.Write( path .. "/" .. id , util.TableToJSON( email, true ) )
 	
 		if rec then
-			net.Start( "datapad_email_new" )
+			net.Start( "gos_email_new" )
 				net.WriteString( "in" )
 				net.WriteTable( { ["title"] = title, ["id"] = id, ["send_rec"] = sender_name, ["time"] = sendTime } )
 			net.Send( rec )
@@ -105,7 +105,7 @@ net.Receive( "datapad_email_send", function( len, ply )
 		["type"] = "out"
 	}
 	
-	local path = "datapad/emails/" .. sender
+	local path = "gos/emails/" .. sender
 	if not file.Exists( path, "DATA" ) then
 		file.CreateDir( path )
 	end
@@ -115,7 +115,7 @@ net.Receive( "datapad_email_send", function( len, ply )
 	local id = sendTime .. "_" .. title .. ".json"
 	file.Write( path .. "/" .. id , util.TableToJSON( email, true ) )
 	
-	net.Start( "datapad_email_new" )
+	net.Start( "gos_email_new" )
 		net.WriteString( "out" )
 		net.WriteTable( { ["title"] = title, ["id"] = id, ["send_rec"] = recs, ["time"] = sendTime } )
 	net.Send( ply )

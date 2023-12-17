@@ -1,4 +1,4 @@
-# Datapad
+# gOS
 A Garry's Mod addon that allows you to bring the power of a small and compact operating system inside the game.
 
 <sup><sub>Yes, you could technically play Garry's Mod from inside itself since it does have a working internet browser.</sub></sup>

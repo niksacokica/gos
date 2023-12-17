@@ -1,6 +1,6 @@
 SWEP.PrintName = "Datapad"
 SWEP.Author = "niksacokica"
-SWEP.Category = "DATAPAD"
+SWEP.Category = "gOS"
 
 SWEP.Spawnable= true
 SWEP.AdminOnly = false
@@ -82,7 +82,7 @@ end
 
 function SWEP:PrimaryAttack()
 	if CLIENT then
-		datapad:createScreen()
+		gos:createScreen()
 	end
 end
 

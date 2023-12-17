@@ -1,16 +1,16 @@
-hook.Add( "DatapadPreScreenCreate", "DatapadEmailsGet", function()
-	net.Start( "datapad_email_get" )
+hook.Add( "gOSPreScreenCreate", "gOSEmailsGet", function()
+	net.Start( "gos_email_get" )
 		net.WriteBool( true )
 	net.SendToServer()
 end )
 
-net.Receive( "datapad_email_all", function()
-	datapad.Emails = net.ReadTable()
+net.Receive( "gos_email_all", function()
+	gos.Emails = net.ReadTable()
 end )
 
-net.Receive( "datapad_email_new", function()
+net.Receive( "gos_email_new", function()
 	local eType = net.ReadString()
-	table.insert( datapad.Emails[eType], net.ReadTable() )
+	table.insert( gos.Emails[eType], net.ReadTable() )
 	
-	hook.Run( "DatapadEmailNewEmail", eType )
+	hook.Run( "gOSEmailNewEmail", eType )
 end )
