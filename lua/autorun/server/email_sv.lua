@@ -24,7 +24,7 @@ net.Receive( "datapad_email_get", function( len, ply )
 					local email = util.JSONToTable( file.Read( path .. "/" .. v, "DATA" ) )
 				
 					if email then
-						table.insert( ( email["type"] == "out" ) and emails["out"] or emails["in"], { ["title"] = email["title"], ["id"] = v, ["send_rec"] = ( email["type"] == "out" ) and emails["recipients"] or emails["sender_name"], ["time"] = email["time"] } )
+						table.insert( ( email["type"] == "out" ) and emails["out"] or emails["in"], { ["title"] = email["title"], ["id"] = v, ["send_rec"] = ( email["type"] == "out" and email["recipients"] or email["sender_name"] ), ["time"] = email["time"] } )
 					else
 						print( v .. " is corrupted!" )
 					end

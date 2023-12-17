@@ -51,9 +51,10 @@ datapad:AddApp({
 			return true
 		end
 		
-		local photo = vgui.Create( "DButton", window )
+		local photo = vgui.Create( "DImageButton", window )
 		photo:SetPos( ScrW() * 0.424, ScrH() * 0.2 )
 		photo:SetSize( ScrH() * 0.1, ScrH() * 0.1 )
+		photo:SetImage( "datapad/other/camera.png" )
 		photo.DoClick = function()
 			LocalPlayer():DrawViewModel( false )
 			window:GetParent():Hide()
@@ -96,15 +97,6 @@ datapad:AddApp({
 			table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 
 			surface.DrawPoly( cir )
-		end
-		
-		photo.Paint = function( self, w, h )
-			draw.NoTexture()
-		
-			surface.SetDrawColor( 255, 255, 255, 200 )
-			drawCircle( w * 0.5, h * 0.5, h * 0.5, 25 )
-			
-			return true
 		end
 	end
 })
