@@ -56,8 +56,7 @@ net.Receive( "datapad_email_send", function( len, ply )
 	local body = net.ReadString()
 	local sendTime = os.time()
 	
-	print(recs)
-	for k, v in ipairs( string.explode( ";", recs ) ) do
+	for k, v in ipairs( string.Explode( ";", recs ) ) do
 		local rec = player.GetByAccountID( v )
 		if not rec then rec = player.GetBySteamID( v ) end
 		if not rec then rec = player.GetBySteamID64( v ) end
@@ -91,7 +90,7 @@ net.Receive( "datapad_email_send", function( len, ply )
 		if rec then
 			net.Start( "datapad_email_new" )
 				net.WriteString( "in" )
-				net.WriteTable( { ["title"] = title, ["id"] = id } )
+				net.WriteTable( { ["title"] = title, ["id"] = id, ["send_rec"] = sender_name, ["time"] = sendTime } )
 			net.Send( rec )
 		end
 	end
@@ -111,11 +110,13 @@ net.Receive( "datapad_email_send", function( len, ply )
 		file.CreateDir( path )
 	end
 	
+	PrintTable(email)
+	
 	local id = sendTime .. "_" .. title .. ".json"
 	file.Write( path .. "/" .. id , util.TableToJSON( email, true ) )
 	
 	net.Start( "datapad_email_new" )
 		net.WriteString( "out" )
-		net.WriteTable( { ["title"] = title, ["id"] = id } )
+		net.WriteTable( { ["title"] = title, ["id"] = id, ["send_rec"] = recs, ["time"] = sendTime } )
 	net.Send( ply )
 end )
