@@ -9,6 +9,8 @@ This addon will receive moderate support for the next several months (this timef
 All issues are to be reported [here.](https://github.com/niksacokica/gos/issues) Issues reported anywhere else will be ignored!<br>
 You can also ask for support in the [swrp devs discord.](https://swrp.dev/)
 
+[Here](https://steamcommunity.com/sharedfiles/filedetails/?id=3116138405) is the workshop page.
+
 This project contains a [wiki(WIP).](https://github.com/niksacokica/gos/wiki) It is made for both users and developers.
 <br><br><br><br><br>
 If you wish to donate you can [here.](https://paypal.me/niksacokica)
