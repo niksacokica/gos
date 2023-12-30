@@ -58,10 +58,10 @@ function gos:StartApp( app )
 		handleWindowClose()
 	end
 	
-	table.insert( self.OpenApps, { window, v["name"], v["icon"] } )
-	v["window"]( window )
+	table.insert( self.OpenApps, { window, app["name"], app["icon"] } )
+	app["window"]( window )
 	
-	hook.Run( "gOSPostAppStart", v, window )
+	hook.Run( "gOSPostAppStart", app, window )
 	
 	return window
 end
